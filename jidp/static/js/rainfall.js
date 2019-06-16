@@ -1,15 +1,8 @@
-function funcx()
-   {
-   // your code here
-   // break out here if needed
-   setTimeout(funcx, 1800);
-   }
 $(document).ready( function() {
     $('#streamsubmit').click(function(event){
       event.preventDefault();
-      let counter = 1;
-
-      for (counter=10;counter<=13;counter++){
+      var counter = 20;
+      function askforimg(){
         $.ajax({
           type:"POST",
           url:'/api/heatmap/',
@@ -22,7 +15,9 @@ $(document).ready( function() {
           .fail(function(){
             alert('Picture loading failed!');
           });
-        funcx();
+        counter++;
       }
+      setInterval(askforimg,1000);
+      askforimg();
     });
 });
