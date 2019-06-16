@@ -1,24 +1,28 @@
+function funcx()
+   {
+   // your code here
+   // break out here if needed
+   setTimeout(funcx, 1800);
+   }
 $(document).ready( function() {
-    
-    
     $('#streamsubmit').click(function(event){
       event.preventDefault();
-      const counter = 1;
+      let counter = 1;
 
-      while (counter < 10){
-        $.delay(800).ajax({
+      for (counter=10;counter<=13;counter++){
+        $.ajax({
           type:"POST",
-          url:'/api/image/',
+          url:'/api/heatmap/',
           contentType: 'application/json', 
-          data:JSON.stringify({picid: counter})
+          data:JSON.stringify({picid: counter}),
         })
-         .done(function(rawImage){
+          .done(function(rawImage){
             $('#currrainfall').attr("src", "data:image/png;base64,"+rawImage);
-         })
-         .fail(function(){
+          })
+          .fail(function(){
             alert('Picture loading failed!');
-         });
-         counter++;
+          });
+        funcx();
       }
     });
 });
