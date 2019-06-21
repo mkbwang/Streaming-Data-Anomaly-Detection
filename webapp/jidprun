@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# jidprun
+
+# quick script that starts the server
+
+# set environment variables
+export FLASK_DEBUG=True
+export FLASK_APP=jidp
+export JIDP_SETTINGS=config.py
+
+# run the server on port 8000
+flask run --host 0.0.0.0 --port 8000
