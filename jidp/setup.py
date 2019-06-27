@@ -17,5 +17,6 @@ setup(
         'sh',
         'numpy',
         'matplotlib',
+	'kafka-python'
     ],
 )

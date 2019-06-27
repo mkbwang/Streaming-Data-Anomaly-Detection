@@ -15,9 +15,10 @@
     <link href="{{url_for('static',filename='css/bootstrap.min.css')}}" rel="stylesheet">
 
     <!-- Custom CSS: You can use this stylesheet to override any Bootstrap styles and/or apply your own styles -->
-    <link href="{{url_for('static',filename='css/custom.css')}}" rel="stylesheet">
+    
     <link rel="stylesheet" href="{{url_for('static',filename='css/jquery-ui.css')}}">
-    <link rel="stylesheet" href="{{url_for('static',filename='css/bootstrap-multiselect.css')}}">
+    <!-- <link rel="stylesheet" href="{{url_for('static',filename='css/bootstrap-multiselect.css')}}"> -->
+    <link href="{{url_for('static',filename='css/custom.css')}}" rel="stylesheet">
 
     <!-- javascripts -->
     <script type="text/javascript" src="{{url_for('static',filename='js/jquery.js')}}"></script>
@@ -30,22 +31,24 @@
 <body>
 
     <!-- Navigation -->
-    <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
         <div class="container">
             <!-- Logo and responsive toggle -->
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                     <span class="sr-only">Toggle navigation</span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#"> JI-DataPipeline</a>
+                <a class="navbar-brand" href="#">
+                	JI-DataPipeline
+                </a>
             </div>
             <!-- Navbar links -->
-            <div class="collapse navbar-collapse" id="navbar">
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    <li class="active">
+                    <li>
                         <a href="#">Home</a>
                     </li>
                 </ul>
@@ -55,33 +58,45 @@
         <!-- /.container -->
     </nav>
 
-<div class="container-fluid">
-
-  
-		<div class="col-sm-3" >
-
-		</div>	
-		<!-- Center Column -->
-		<div class="col-sm-6" >
-			<!-- Articles -->
-			<div >
-				<article class="col-xs-12">
-                    <div class = "form">
-                        <form action="#" method="post" enctype="multipart/form-data">
-                            <button id="streamsubmit" class="ui-button ui-widget ui-corner-all">Start Streaming</button>
-                        </form>
-                    </div>
-                    <p>
-                        <img id="currrainfall" src = "" alt="No plot generated yet"  height="360px" width="480px"/>
-                    </p>
-                </article>
+        <div class="container">
+            <!-- Heading -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header">Anomaly Detection for Streaming Weather Data
+                    </h1>
+                </div>
             </div>
-            
-            <hr>
-
-            
-	    </div><!--/container-fluid-->
-	
+  
+		    <div class="row">
+            <div class="col-md-6 portfolio-item">
+                <a href="#">
+                    <img id="currrainfall" class="img-responsive" src = "" alt="No plot generated yet" width="70%" height="70%"  />
+                </a>
+                <h3>
+                    <a>Most Recent Rainfall Heatmap</a>
+                </h3>
+                <p>This most recent rainfall heatmap is updated every one second.</p>
+            </div>
+            <div class="col-md-6 portfolio-item">
+                <a href="#">
+                    <img id="anomalyalert" class="img-responsive" src="" alt="No plot generated yet" width="70%" height="70%" />
+                </a>
+                <h3>
+                    <a>Anomaly Alert</a>
+                </h3>
+                <p>This plot updates the positions where average rainfall exceeds 15 every 30 seconds.</p>
+            </div>
+            </div>
+        </div>
+		<!-- Center Column -->
+		<!--/container-fluid-->
+        <footer>
+            <div class="copyright">
+                <div class="container">
+                    <p>Copyright &copy; datapipeline.com 2019</p>
+                </div>
+            </div>
+        </footer>
 	
 </body>
 

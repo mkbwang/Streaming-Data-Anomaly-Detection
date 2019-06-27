@@ -1,10 +1,12 @@
 data/
 env/
-jidp.egg-info/
+jidp/jidp.egg-info/
 kafka_2.12-2.2.0/
 .vscode
-__pycache__/
+jidp/__pycache__/
 .gradle/
 .idea/
 .DS_store
 *.jar
+jidp/jidp.sock
+
