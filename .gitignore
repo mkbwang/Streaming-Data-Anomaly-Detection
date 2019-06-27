@@ -7,6 +7,7 @@ jidp/__pycache__/
 .gradle/
 .idea/
 .DS_store
+scheduler/build/
 *.jar
 jidp/jidp.sock
 
