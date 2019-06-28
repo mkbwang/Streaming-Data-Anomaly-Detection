@@ -8,18 +8,17 @@ import jidp
 import base64
 import matplotlib.pyplot as plt
 
-@jidp.app.route('/api/heatmap/',methods=["POST"])
-def get_heatmap():
+@jidp.app.route('/api/anomaly/',methods=["GET"])
+def get_anomaly():
     directory = jidp.model.get_rainfall() # get the directory
-    feedback = flask.request.get_json() # get the json file
-    filename = "array_"+str(feedback["picid"])+".npy"
+    filename = "example.npy"
     total_directory = os.path.join(directory, filename)
-    data = np.load(total_directory)# load the matrix
-    # plot the heatmap
+    mat = np.load(total_directory)
+    # with open(total_directory, "rb") as img_file:
+    #    imgstring = base64.b64encode(img_file.read())
+    plt.figure(figsize=(4, 3))
     fig, ax = plt.subplots()
-    im = ax.imshow(data, cmap=plt.get_cmap('Reds'), interpolation='nearest',
-                   vmin=0, vmax=80)
-    fig.colorbar(im)
+    im = ax.imshow(mat)
     # store it as a base64 stream and send it
     strIO = io.BytesIO()
     plt.savefig(strIO, format='png')
