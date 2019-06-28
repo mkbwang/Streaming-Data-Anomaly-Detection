@@ -30,9 +30,15 @@ import java.util.Properties;
 public class MatrixThresholdLamda implements Runnable {
 
     private int _ID;
+    private int _threshold;
+    private String _topic;
+    private int _window;
 
-    public MatrixThresholdLamda(int ID) {
+    public MatrixThresholdLamda(int ID, int threshold, String topic, int window) {
         _ID = ID;
+        _threshold = threshold;
+        _topic = topic;
+        _window = window;
     }
 
     public void run() {
@@ -56,13 +62,13 @@ public class MatrixThresholdLamda implements Runnable {
 
         // would be important for anomaly detection.
         // streamsConfiguration.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, 100);
-        // streamsConfiguration.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, 0);
+        //streamsConfiguration.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, 0);
 
 
         final StreamsBuilder builder = new StreamsBuilder();
 
 
-        final KStream<String, String> views = builder.stream("test9");
+        final KStream<String, String> views = builder.stream(_topic);
 
         KStream<String, String> mappedStream = views
                 .flatMap((k, v) -> {
@@ -80,7 +86,7 @@ public class MatrixThresholdLamda implements Runnable {
         });
 
         KGroupedStream<String, String> groupedStream = mappedStream.groupByKey(Grouped.with(stringSerde, stringSerde));
-        TimeWindowedKStream <String, String> windowedStream = groupedStream.windowedBy(TimeWindows.of(Duration.ofSeconds(20)).grace(Duration.ofSeconds(1)));
+        TimeWindowedKStream <String, String> windowedStream = groupedStream.windowedBy(TimeWindows.of(Duration.ofSeconds(_window)).grace(Duration.ofSeconds(1)));
         KTable<Windowed<String>, Tuple2<Double, Double>> aggregatedStream = windowedStream
                 .aggregate(
                         () -> new Tuple2<>(0.0, 0.0),
@@ -98,7 +104,7 @@ public class MatrixThresholdLamda implements Runnable {
                 .suppress(Suppressed.untilWindowCloses(Suppressed.BufferConfig.unbounded()));
 
             KStream<String, String> anmalousData = aggregatedStream.mapValues(value -> Double.toString(value.value2 / value.value1))
-                .filter((key, value) -> Double.parseDouble(value) > 7.0)
+                .filter((key, value) -> Double.parseDouble(value) > (double)_threshold)
                 .toStream()
                 .filter((key, value) ->  value != null)
                 .map(((key, value) -> KeyValue.pair(key.toString(), key.key())));
