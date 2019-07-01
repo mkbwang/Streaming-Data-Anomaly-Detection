@@ -11,7 +11,7 @@ $(document).ready( function() {
         alert('Picture loading failed!');
       });
   }
-  setInterval(askforimg1,10000);
+  setInterval(askforimg1,3000);
   function askforimg2(){
     $.ajax({
       type:"GET",
