@@ -19,10 +19,13 @@ public class JobController {
     @RequestMapping(value = "api_v1/job", method = RequestMethod.POST)
     public JobResponse StartJobController(@RequestBody JsonNode request) {
         System.out.print(request.toString());
-        System.out.print(request.get("threshold").asInt());
 
-        //Thread streamer = new Thread(new MatrixThresholdLamda(counter.incrementAndGet()));
-        //streamer.start();
+        int threshold = request.get("threshold").asInt();
+        String topic = request.get("topic").asText();
+        int window = request.get("window").asInt();
+
+        Thread streamer = new Thread(new MatrixThresholdLamda(counter.getAndAdd(1), threshold, topic, window));
+        streamer.start();
         return new JobResponse(0, counter.get());
     }
 }
