@@ -10,4 +10,8 @@ jidp/__pycache__/
 scheduler/build/
 *.jar
 jidp/jidp.sock
+*.npy
+jidp/temporary/currentrain.npy
+jidp/temporary/example.npy
+*.out
 
