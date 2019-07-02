@@ -1,13 +1,9 @@
 package datapipeline.streamer;
 
 import com.google.gson.Gson;
-import com.sun.tools.javac.util.Pair;
-import datapipeline.FakeProducer;
 import datapipeline.KafkaConstants;
 import datapipeline.common.Tuple2;
 import datapipeline.common.Tuple2Serde;
-import kafka.utils.json.JsonObject;
-import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.utils.Bytes;
@@ -16,10 +12,7 @@ import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.*;
-import org.apache.kafka.common.serialization.StringSerializer;
-import org.apache.kafka.connect.json.JsonSerializer;
 import org.apache.kafka.streams.state.WindowStore;
-import sun.tools.tree.DoubleExpression;
 
 import java.time.Duration;
 import java.util.LinkedList;
@@ -42,11 +35,9 @@ public class MatrixThresholdLamda implements Runnable {
     }
 
     public void run() {
+
         final Properties streamsConfiguration = new Properties();
         final Serde<String> stringSerde = Serdes.String();
-        final Serde<Long> longSerde = Serdes.Long();
-        final Serde<Double> doubleSerde = Serdes.Double();
-        final Serde<Integer> integerSerde = Serdes.Integer();
 
         // Give the Streams application a unique name.  The name must be unique in the Kafka cluster
         // against which the application is run.
@@ -60,9 +51,9 @@ public class MatrixThresholdLamda implements Runnable {
         streamsConfiguration.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());
         streamsConfiguration.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName()); // Set the commit interval to 500ms so that any changes are flushed frequently. The low latency
 
-        // would be important for anomaly detection.
-        // streamsConfiguration.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, 100);
-        //streamsConfiguration.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, 0);
+        // ***very important***
+        //streamsConfiguration.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, 100);
+        streamsConfiguration.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, 0);
 
 
         final StreamsBuilder builder = new StreamsBuilder();
@@ -72,21 +63,21 @@ public class MatrixThresholdLamda implements Runnable {
 
         KStream<String, String> mappedStream = views
                 .flatMap((k, v) -> {
-            List<KeyValue<String, String>> result = new LinkedList<>();
+                    List<KeyValue<String, String>> result = new LinkedList<>();
 
-            Gson gson = new Gson();
-            int[][] value = gson.fromJson(v, int[][].class);
+                    Gson gson = new Gson();
+                    int[][] value = gson.fromJson(v, int[][].class);
 
-            for (int i = 0; i < value.length; i++) {
-                for (int j = 0; j < value[i].length; j++) {
-                    result.add(new KeyValue<>(Integer.toString(i * value[i].length + j), Integer.toString(value[i][j])));
-                }
-            }
-            return result;
-        });
+                    for (int i = 0; i < value.length; i++) {
+                        for (int j = 0; j < value[i].length; j++) {
+                            result.add(new KeyValue<>(Integer.toString(i * value[i].length + j), Integer.toString(value[i][j])));
+                        }
+                    }
+                    return result;
+                });
 
         KGroupedStream<String, String> groupedStream = mappedStream.groupByKey(Grouped.with(stringSerde, stringSerde));
-        TimeWindowedKStream <String, String> windowedStream = groupedStream.windowedBy(TimeWindows.of(Duration.ofSeconds(_window)).grace(Duration.ofSeconds(1)));
+        TimeWindowedKStream <String, String> windowedStream = groupedStream.windowedBy(TimeWindows.of(Duration.ofMillis(_window)).grace(Duration.ofMillis((long)(_window * 0.1))));
         KTable<Windowed<String>, Tuple2<Double, Double>> aggregatedStream = windowedStream
                 .aggregate(
                         () -> new Tuple2<>(0.0, 0.0),
@@ -103,14 +94,16 @@ public class MatrixThresholdLamda implements Runnable {
                 )
                 .suppress(Suppressed.untilWindowCloses(Suppressed.BufferConfig.unbounded()));
 
-            KStream<String, String> anmalousData = aggregatedStream.mapValues(value -> Double.toString(value.value2 / value.value1))
+        KStream<String, String> anomalousData = aggregatedStream.mapValues(value -> Double.toString(value.value2 / value.value1))
                 .filter((key, value) -> Double.parseDouble(value) > (double)_threshold)
                 .toStream()
                 .filter((key, value) ->  value != null)
                 .map(((key, value) -> KeyValue.pair(key.toString(), key.key())));
 
-        anmalousData.to("notification_job_" + _ID);
+        anomalousData.to("notification_job_" + _ID);
         final KafkaStreams streams = new KafkaStreams(builder.build(), streamsConfiguration);
+
+
         // Always (and unconditionally) clean local state prior to starting the processing topology.
         // We opt for this unconditional call here because this will make it easier for you to play around with the example
         // when resetting the application for doing a re-run (via the Application Reset Tool,
@@ -126,5 +119,6 @@ public class MatrixThresholdLamda implements Runnable {
 
         // Add shutdown hook to respond to SIGTERM and gracefully close Kafka Streams
         Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
+
     }
 }
