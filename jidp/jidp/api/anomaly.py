@@ -6,6 +6,8 @@ import numpy as np
 import io
 import jidp
 import base64
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 @jidp.app.route('/api/anomaly/',methods=["GET"])
@@ -23,5 +25,6 @@ def get_anomaly():
     strIO = io.BytesIO()
     plt.savefig(strIO, format='png')
     strIO.seek(0)
+    plt.close('all')
     plotcode = base64.encodestring(strIO.read())
     return plotcode.decode('utf-8'), 200, {'Content-Type': 'text/plain'}
