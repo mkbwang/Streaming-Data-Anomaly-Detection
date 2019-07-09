@@ -15,15 +15,15 @@
     <link href="{{url_for('static',filename='css/bootstrap.min.css')}}" rel="stylesheet">
 
     <!-- Custom CSS: You can use this stylesheet to override any Bootstrap styles and/or apply your own styles -->
-    
-    <link rel="stylesheet" href="{{url_for('static',filename='css/jquery-ui.css')}}">
-    <!-- <link rel="stylesheet" href="{{url_for('static',filename='css/bootstrap-multiselect.css')}}"> -->
     <link href="{{url_for('static',filename='css/custom.css')}}" rel="stylesheet">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/jquery-ui.min.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/bootstrap-multiselect.css')}}">
+    
 
     <!-- javascripts -->
-    <script type="text/javascript" src="{{url_for('static',filename='js/jquery.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static',filename='js/jquery.min.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static',filename='js/bootstrap.min.js')}}"></script>
-    <script type="text/javascript" src="{{url_for('static',filename='js/jquery-ui.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static',filename='js/jquery-ui.min.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static',filename='js/bootstrap-multiselect.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static',filename='js/echarts.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static',filename='js/rainfall.js')}}"></script>
@@ -72,6 +72,7 @@
   
 		    <div class="row">
             <div class="col-md-6 portfolio-item">
+                
                 <a href="#">
                     <img id="currrainfall" class="img-responsive" src = "" alt="No plot generated yet" width="70%" height="70%"  />
                 </a>
@@ -81,6 +82,8 @@
                 <p>This most recent rainfall heatmap is updated every one second.</p>
             </div>
             <div class="col-md-6 portfolio-item">
+                Current threshold: <input type="text" id="currbar" readonly style="border:0; color:#f6931f; font-weight:bold;">
+                <div id="rainthreshold"></div>
                 <div id="anomalyalert" style="height:300%;width:75%;"></div>
                 <h3>
                     <a>Anomaly Alert</a>
@@ -96,30 +99,46 @@
             </div>
             <div class="row">
             <div class="col-md-6 portfolio-item">
-                <h2>Anomaly Customers</h2>
+                <h3><a>Anomaly Customers</a></h3>
                 <fieldset>
-                <legend>Hotel Ratings: </legend>
-                <label for="checkbox-1">2 Star</label>
-                <input type="checkbox" name="checkbox-1" id="checkbox-1">
-                <label for="checkbox-2">3 Star</label>
-                <input type="checkbox" name="checkbox-2" id="checkbox-2">
-                <label for="checkbox-3">4 Star</label>
-                <input type="checkbox" name="checkbox-3" id="checkbox-3">
-                <label for="checkbox-4">5 Star</label>
-                <input type="checkbox" name="checkbox-4" id="checkbox-4">
+                <b>Tick the rules that you are interested in:</b>
+                <br>
+                <input type="checkbox" id="c1"> Users who have clicked more than <input id="customer1" name="value"> brands recently.
+                <br>
+                <input type="checkbox" id="c2"> Users who have clicked more than <input id="customer2" name="value"> products recently.
+                <br>
+                <input type="checkbox" id="c3"> Users who have clicked more than <input id="customer3" name="value"> items recently.
                 </fieldset>
+                <br>
+                <button id="submit1" class="ui-button ui-widget ui-corner-all">Update Rule</button>
+                <br>
+                <table width="90%" class="table">
+                    <thead><tr> <th>Timestamp</th> <th>User ID</th> <th>Anomaly Reason</th> </tr></thead>
+                    <tr> <th>20:10</th> <th>0000001</th> <th>Clicked more than 40 brands.</th> </tr>
+                    <tr> <th>19:18</th> <th>0000002</th> <th>Clicked more than 30 products.</th> </tr>
+                    <tr> <th>18:17</th> <th>0000003</th> <th>Clicked more than 10 categories.</th> </tr>
+                </table>
             </div>
             <div class="col-md-6 portfolio-item">
-                <h2>Anomaly Brands/</h2>
+                <h3><a>Anomaly Brands/Products/Categories</a></h3>
                 <fieldset>
-                    <legend>Select your interested Statistical Rules: </legend>
-                    <label for="radio-1">New York</label>
-                    <input type="radio" name="radio-1" id="radio-1">
-                    <label for="radio-2">Paris</label>
-                    <input type="radio" name="radio-1" id="radio-2">
-                    <label for="radio-3">London</label>
-                    <input type="radio" name="radio-1" id="radio-3">
+                <b>Tick the rules that you are interested in:</b>
+                <br>
+                <input type="checkbox" id="wantbrand"> Brand that has been viewed more than <input id="brandspin" name="value"> times recently.
+                <br>
+                <input type="checkbox" id="wantproduct"> Product that has been viewed more than <input id="productspin" name="value"> times recently.
+                <br>
+                <input type="checkbox" id="wantcategory"> Category that has been viewed more than <input id="categoryspin" name="value"> times recently.
                 </fieldset>
+                <br>
+                <button id="submit2" class="ui-button ui-widget ui-corner-all">Update Rule</button>
+                <br>
+                <table width="90%" class="table">
+                    <thead><tr> <th>Timestamp</th> <th>Case</th> <th>ID</th> </tr></thead>
+                    <tr> <th>20:10</th> <th>Brand</th> <th>0023981</th> </tr>
+                    <tr> <th>19:18</th> <th>Product</th> <th>8973984</th> </tr>
+                    <tr> <th>18:17</th> <th>Category</th> <th>8724387</th> </tr>
+                </table>
             </div>
             </div>
         </div>
