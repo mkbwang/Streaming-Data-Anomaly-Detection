@@ -1,4 +1,5 @@
 $(document).ready(function(){
+    $('#submit0').click();
     var dom = document.getElementById("anomalyalert");
     var myChart = echarts.init(dom);
     option = {
@@ -6,7 +7,8 @@ $(document).ready(function(){
             scale: false
         },
         yAxis: {
-            scale: false
+            scale: false,
+            inverse: true,
         },
         series: [{
             type: 'effectScatter',
