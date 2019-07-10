@@ -10,12 +10,23 @@ $(document).ready(function(){
         },
         series: [{
             type: 'effectScatter',
-            symbolSize: 20,
+            symbolSize: 10,
+            color:"#ca8622",
             data: [
                 [400, 105.2],
-                [153.4, 142]
+                [153.4, 142],
+                [120, 400],
+                [220, 50]
             ]
-        }, {
+        }, 
+        {
+            type: 'effectScatter',
+            symbolSize: 10,
+            data: [
+                [300, 105.2],
+                [153.4, 182]
+            ]
+        },{
             type: 'scatter',
             data: [[500, 0], [0, 500], [500, 500], [0, 0]
             ],
