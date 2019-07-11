@@ -6,6 +6,7 @@ kafka_2.12-2.2.0/
 jidp/jidp/__pycache__/
 jidp/jidp/api/__pycache__/
 jidp/jidp/views/__pycache__/
+jidp/fakejson.py
 .gradle/
 .idea/
 .DS_store

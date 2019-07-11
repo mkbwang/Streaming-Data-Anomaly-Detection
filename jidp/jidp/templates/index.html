@@ -72,25 +72,25 @@
   
 		    <div class="row">
             <div class="col-md-6 portfolio-item">
-                
-                <a href="#">
-                    <img id="currrainfall" class="img-responsive" src = "" alt="No plot generated yet" width="70%" height="70%"  />
-                </a>
                 <h3>
                     <a>Most Recent Rainfall Heatmap</a>
                 </h3>
-                <p>This most recent rainfall heatmap is updated every one second.</p>
+                <a href="#">
+                    <img id="currrainfall" class="img-responsive" src = "" alt="No plot generated yet" width="70%" height="70%"  />
+                </a>
+                <p>This most recent rainfall heatmap is updated every three seconds.</p>
             </div>
             <div class="col-md-6 portfolio-item">
+                <h3>
+                    <a>Anomaly Alert</a>
+                </h3>
                 Current threshold: <input type="text" id="currbar" readonly style="border:0; color:#f6931f; font-weight:bold;">
                 <div id="rainthreshold"></div>
                 <br>
                 <button id="submit0" class="ui-button ui-widget ui-corner-all">Update Rule</button>
                 <div id="anomalyalert" style="height:300%;width:75%;"></div>
-                <h3>
-                    <a>Anomaly Alert</a>
-                </h3>
-                <p>This plot updates the positions where average rainfall exceeds 15 every 30 seconds.</p>
+                
+                <p>Orange points are those which exceeds the threshold above. Red points are those which exceeds the median by twice the standard error based on historical data.</p>
             </div>
             </div>
             <div class="row">
