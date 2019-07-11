@@ -42,6 +42,7 @@ table thead th
 {
     background-color: #CCE8EB;
     width: 100px;
+    text-align: center;
 }
 table tr:nth-child(odd)
 {

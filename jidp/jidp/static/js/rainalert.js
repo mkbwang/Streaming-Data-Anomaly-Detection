@@ -34,13 +34,11 @@ $(document).ready(function(){
             dataType : "json",
             success: function(result){
                 option['series'][0]['data'] = result.a1;
-                console.log(option['series'][0]['data']);
                 option['series'][1]['data'] = result.a2;
-                console.log(option['series'][0]['data']);
                 anomalychart.setOption(option);
             },
             error: function(errormsg){
-                console.log("fetch anomaly rainfall failed!")
+                console.log("fetch anomaly rainfall failed!");
             }
         });
     }
