@@ -1,5 +1,14 @@
 $(document).ready(function(){
-    $('#submit0').click();
+    $( "#rainthreshold" ).slider({
+        range: "max",
+        min: 6,
+        max: 18,
+        value: 1,
+        slide: function( event, ui ) {
+          $( "#currbar" ).val( ui.value );
+        }
+      });
+    $( "#currbar" ).val( $( "#rainthreshold" ).slider( "value" ) );
     function askforalert(){
         let anomalychart = echarts.init(document.getElementById('anomalyalert'));
         let option = {
@@ -42,39 +51,6 @@ $(document).ready(function(){
             }
         });
     }
+    setInterval(askforalert, 5000);
     askforalert();
-    // var dom = document.getElementById("anomalyalert");
-    // var myChart = echarts.init(dom);
-    // option = {
-    //     xAxis: {
-    //         scale: false
-    //     },
-    //     yAxis: {
-    //         scale: false,
-    //         inverse: true,
-    //     },
-    //     series: [{
-    //         type: 'effectScatter',
-    //         symbolSize: 10,
-    //         color:"#ca8622",
-    //         data: [
-    //             [400, 105.2],
-    //             [153.4, 142],
-    //             [120, 400],
-    //             [220, 50]
-    //         ]
-    //     }, 
-    //     {
-    //         type: 'effectScatter',
-    //         symbolSize: 10,
-    //         data: [
-    //             [300, 105.2],
-    //             [153.4, 182]
-    //         ]
-    //     },{
-    //         type: 'scatter',
-    //         data: [[500, 0], [0, 500], [500, 500], [0, 0]
-    //         ],
-    //     }]
-    // };
 });
