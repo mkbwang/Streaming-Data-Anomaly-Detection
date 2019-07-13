@@ -22,15 +22,3 @@ def get_anomaly():
         anomaly2 = json.load(f)
     output = {"a1": anomaly1["anomaly"], "a2": anomaly2["anomaly"]}
     return jsonify(output), 200
-    # with open(total_directory, "rb") as img_file:
-    #    imgstring = base64.b64encode(img_file.read())
-    # plt.figure(figsize=(4, 3))
-    # fig, ax = plt.subplots()
-    # im = ax.imshow(mat)
-    # # store it as a base64 stream and send it
-    # strIO = io.BytesIO()
-    # plt.savefig(strIO, format='png')
-    # strIO.seek(0)
-    # plt.close('all')
-    # plotcode = base64.encodestring(strIO.read())
-    # return plotcode.decode('utf-8'), 200, {'Content-Type': 'text/plain'}
