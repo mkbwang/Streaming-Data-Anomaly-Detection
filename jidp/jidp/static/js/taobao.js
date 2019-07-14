@@ -12,6 +12,7 @@ $(document).ready( function() {
           '<td><%this.TimeStamp%> </td>' +
           '<td><%this.UserID%> </td>' +
           '<td><%this.AnomalyReason%> </td>' +
+          '<td><%this.threshold%> </td>' +
           '</tr>';
       $.ajax({
         type:"get",
@@ -31,12 +32,13 @@ $(document).ready( function() {
         }
       });
     };
-    customertable();
+    
     function otherstable(){
       let rowTemplate = '<tr>' +
           '<td><%this.TimeStamp%> </td>' +
           '<td><%this.Case%> </td>' +
           '<td><%this.ID%> </td>' +
+          '<td><%this.threshold%> </td>' +
           '</tr>';
       $.ajax({
         type:"get",
@@ -56,5 +58,9 @@ $(document).ready( function() {
         }
       });
     };
+    setInterval(customertable,1000);
+    customertable();
+    setInterval(otherstable,1000);
     otherstable();
+    
 } );
