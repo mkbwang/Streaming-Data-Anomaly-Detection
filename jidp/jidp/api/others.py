@@ -8,7 +8,7 @@ import jidp
 import base64
 import json
 from flask import jsonify
-
+ 
 @jidp.app.route('/api/otherstable/',methods=["GET"])
 def get_others():
     directory = jidp.model.get_rainfall() # get the directory

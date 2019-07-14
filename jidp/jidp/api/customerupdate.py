@@ -10,7 +10,7 @@ import json
 import pickle
 from flask import jsonify
 
-@jidp.app.route('/api/customerupdate/',methods=["POST"])
+@jidp.app.route('/api/customerupdate/',methods=["POST", "GET"])
 def get_customerupdate():
     directory = jidp.model.get_rainfall()
     tempthreshold = os.path.join(directory, "customerthreshold.json")
