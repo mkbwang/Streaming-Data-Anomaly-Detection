@@ -19,9 +19,12 @@ def get_customerupdate():
     # update the standards that the user suggests
     if flask.request.method=="GET":
         # this is meant for setting the threshold value when the user first open the site
+        initialstate = {}
         with open(tempthreshold, 'r') as f:
-            output = json.load(f)
-        return jsonify(output), 200
+            initialstate["threshold"] = json.load(f)
+        with open(tempstandard, 'r') as f:
+            initialstate["standard"] = json.load(f)
+        return jsonify(initialstate), 200
     else: # post request, user change threshold
         feedback = flask.request.get_json()
         for key in feedback:

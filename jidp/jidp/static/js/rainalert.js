@@ -3,12 +3,20 @@ $(document).ready(function(){
         range: "max",
         min: 6,
         max: 18,
-        value: 1,
         slide: function( event, ui ) {
           $( "#currbar" ).val( ui.value );
         }
       });
     $( "#currbar" ).val( $( "#rainthreshold" ).slider( "value" ) );
+    $.ajax({
+        type:"get",
+        url:"/api/rainupdate/",
+        dataType : "json",
+        success: function(result){
+            $("#rainthreshold").slider('value',result.threshold);
+            $( "#currbar" ).val( result.threshold );
+        }
+    });
     function askforalert(){
         let anomalychart = echarts.init(document.getElementById('anomalyalert'));
         let option = {
