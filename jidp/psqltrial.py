@@ -5,7 +5,7 @@ from datetime import datetime
 import time
 
 if __name__=="__main__":
-    conn = pg.connect("dbname=anomalydb user=wangmk")
+    conn = pg.connect("dbname=anomalydb user=wmk")
     cur = conn.cursor() # connect to the server and get the cursor
     for ts in range(10):
         date_object = datetime.now()

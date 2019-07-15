@@ -12,7 +12,7 @@ from flask import jsonify
 
 @jidp.app.route('/api/anomaly/',methods=["GET"])
 def get_anomaly():
-    conn = pg.connect("dbname=anomalydb user=wangmk")
+    conn = pg.connect("dbname=anomalydb user=wmk")
     cur = conn.cursor()
     cur.execute("SELECT * FROM rainfall WHERE anomalytype = 'threshold' ORDER BY inserttime DESC;")
     threshold = cur.fetchone()

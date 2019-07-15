@@ -24,7 +24,7 @@ def transform(data):
 @jidp.app.route('/api/otherstable/',methods=["GET"])
 def get_others():
     directory = jidp.model.get_rainfall() # get the directory
-    conn = pg.connect("dbname=anomalydb user=wangmk")
+    conn = pg.connect("dbname=anomalydb user=wmk")
     cur = conn.cursor()
     standardfile = os.path.join(directory, "othersstandard.json")
     with open(standardfile, 'r') as f:
