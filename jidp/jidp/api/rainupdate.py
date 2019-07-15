@@ -9,9 +9,19 @@ import base64
 import json
 from flask import jsonify
 
-@jidp.app.route('/api/rainupdate/',methods=["POST"])
+@jidp.app.route('/api/rainupdate/',methods=["POST", "GET"])
 def get_rainupdate():
-    feedback = flask.request.get_json()
-    print(feedback)
-    output = {"status":"good"}
-    return jsonify(output), 201
+    directory = jidp.model.get_rainfall()
+    tempthreshold = os.path.join(directory, "rainthreshold.json")
+    if flask.request.method=="GET":
+        # this is meant for setting the threshold value when the user first open the site
+        with open(tempthreshold, 'r') as f:
+            output = json.load(f)
+        return jsonify(output), 200
+    else:
+        # update the rain threshold
+        feedback = flask.request.get_json()
+        with open(tempthreshold, "w+") as f:
+            json.dump(feedback, f)
+        output = {"status":"good"}
+        return jsonify(output), 201
