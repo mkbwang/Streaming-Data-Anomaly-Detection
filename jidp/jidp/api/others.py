@@ -17,6 +17,7 @@ def transform(data):
     newdict["Case"] = data[1]
     newdict["ID"] = data[2]
     newdict["threshold"] = str(data[3])
+    newdict["value"] = str(data[4])
     return newdict
 
 

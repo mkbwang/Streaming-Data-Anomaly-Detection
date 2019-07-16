@@ -26,7 +26,7 @@
     <script type="text/javascript" src="{{url_for('static',filename='js/bootstrap.min.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static',filename='js/jquery-ui.min.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static',filename='js/bootstrap-multiselect.js')}}"></script>
-    <script type="text/javascript" src="{{url_for('static',filename='js/echarts.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static',filename='js/echarts.min.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static',filename='js/rainfall.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static',filename='js/rainalert.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static',filename='js/taobao.js')}}"></script>
@@ -93,7 +93,7 @@
                 <button id="submit0" class="ui-button ui-widget ui-corner-all">Update Rule</button>
                 <div id="anomalyalert" style="height:300%;width:75%;"></div>
                 
-                <p>Orange points are those which exceeds the threshold above. Red points are those which exceeds the median by twice the standard error based on historical data.</p>
+                <p>Orange points are those which exceeds the threshold above. Red points are those which exceeds the mean by twice the standard error based on historical data.</p>
             </div>
             </div>
             <div class="row">
@@ -118,7 +118,7 @@
                 <button id="submit1" class="ui-button ui-widget ui-corner-all">Update Rule</button>
                 <br>
                 <table width="90%" class="table" id="customertable">
-                    <thead><tr> <th>Timestamp</th> <th>User ID</th> <th>Anomaly Reason</th>  <th>Threshold</th> </tr></thead>
+                    <thead><tr> <th>Timestamp</th> <th>User ID</th> <th>Anomaly Reason</th>  <th>Threshold</th> <th>Click #</th> </tr></thead>
                     <tbody></tbody>
                 </table>
             </div>
@@ -137,7 +137,7 @@
                 <button id="submit2" class="ui-button ui-widget ui-corner-all">Update Rule</button>
                 <br>
                 <table width="90%" class="table" id="otherstable">
-                    <thead><tr> <th>Timestamp</th> <th>Case</th> <th>ID</th> <th>Threshold</th> </tr></thead>
+                    <thead><tr> <th>Timestamp</th> <th>Case</th> <th>ID</th> <th>Threshold</th><th>Click #</th> </tr></thead>
                     <tbody></tbody>
                 </table>
             </div>

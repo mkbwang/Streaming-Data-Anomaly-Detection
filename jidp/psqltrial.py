@@ -10,16 +10,16 @@ if __name__=="__main__":
     for ts in range(10):
         date_object = datetime.now()
         current_time = date_object.strftime('%Y-%m-%d %H:%M:%S')
-        rainpoint = [[100,100],[400,400]]
-        outlierpoint = [[400,100],[100,400]]
-        cur.execute("INSERT INTO rainfall (inserttime, anomalytype, points, threshold) VALUES(%s, %s, %s ,%s)",
-                    (current_time, "threshold", rainpoint, 40)) # store data into anomalydb
-        cur.execute("INSERT INTO rainfall (inserttime, anomalytype, points) VALUES(%s, %s, %s)",
-                    (current_time, "statistical", outlierpoint)) # store data into anomalydb
-        cur.execute("INSERT INTO customer (inserttime, anomalytype, userid, threshold) VALUES(%s, %s, %s ,%s)",
-                    (current_time, "brand", "89715", 14))
-        cur.execute("INSERT INTO others (inserttime, anomalytype, id, threshold) VALUES(%s, %s, %s ,%s)",
-                    (current_time, "category", "3346", 10))
+        rainpoint = [100,100]
+        outlierpoint = [400,100]
+        cur.execute("INSERT INTO rainfall (inserttime, anomalytype, points, threshold, value) VALUES(%s, %s, %s ,%s, %s)",
+                    (current_time, "threshold", rainpoint, 8, 20)) # store data into anomalydb
+        cur.execute("INSERT INTO rainfall (inserttime, anomalytype, points, value) VALUES(%s, %s, %s, %s)",
+                    (current_time, "statistical", outlierpoint, 20)) # store data into anomalydb
+        cur.execute("INSERT INTO customer (inserttime, anomalytype, userid, threshold, value) VALUES(%s, %s, %s ,%s, %s)",
+                    (current_time, "brand", "89715", 8, 14))
+        cur.execute("INSERT INTO others (inserttime, anomalytype, id, threshold, value) VALUES(%s, %s, %s ,%s, %s)",
+                    (current_time, "category", "3346", 8, 14))
         time.sleep(0.5)
     conn.commit()
     # an example of selecting certain rows ordered by time of insertion

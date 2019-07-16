@@ -49,6 +49,7 @@ $(document).ready( function() {
           '<td><%this.UserID%> </td>' +
           '<td><%this.AnomalyReason%> </td>' +
           '<td><%this.threshold%> </td>' +
+          '<td><%this.value%></td>' +
           '</tr>';
       $.ajax({
         type:"get",
@@ -75,6 +76,7 @@ $(document).ready( function() {
           '<td><%this.Case%> </td>' +
           '<td><%this.ID%> </td>' +
           '<td><%this.threshold%> </td>' +
+          '<td><%this.value%></td>'+
           '</tr>';
       $.ajax({
         type:"get",

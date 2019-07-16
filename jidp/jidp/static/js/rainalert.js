@@ -1,8 +1,8 @@
 $(document).ready(function(){
     $( "#rainthreshold" ).slider({
         range: "max",
-        min: 6,
-        max: 18,
+        min: 5,
+        max: 25,
         slide: function( event, ui ) {
           $( "#currbar" ).val( ui.value );
         }
@@ -29,14 +29,14 @@ $(document).ready(function(){
             },
             series: [{
                 type: 'effectScatter',
-                symbolSize: 10,
+                symbolSize: 5,
                 color:"#ca8622",
                 data: [
                 ]
             }, 
             {
                 type: 'effectScatter',
-                symbolSize: 10,
+                symbolSize: 5,
                 data: [
                 ]
             },{
@@ -59,6 +59,6 @@ $(document).ready(function(){
             }
         });
     }
-    setInterval(askforalert, 5000);
+    setInterval(askforalert, 2000);
     askforalert();
 });

@@ -8,6 +8,8 @@ import jidp
 import base64
 import json
 import pickle
+from datetime import datetime
+from datetime import timedelta
 import psycopg2 as pg
 from flask import jsonify
 
@@ -18,6 +20,7 @@ def transform(data):
     newdict["AnomalyReason"] = data[1]
     newdict["UserID"] = data[2]
     newdict["threshold"] = str(data[3])
+    newdict["value"] = str(data[4])
     return newdict
 
 

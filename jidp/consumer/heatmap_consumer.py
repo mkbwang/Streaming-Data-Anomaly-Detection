@@ -4,11 +4,13 @@ import pickle
 import json
 
 
-consumer = KafkaConsumer('test1',
+consumer = KafkaConsumer('weatherdata',
                          bootstrap_servers=['localhost:9092'])
 id = 0
 array = np.zeros((501,501))
 for message in consumer:
+    # print("message received")
     newval = np.array(json.loads(message.value.decode('utf-8')))
-    np.save('temporary/currentrain.npy', newval)
+    newval = newval.reshape((501, 501))
+    np.save('../temporary/currentrain.npy', newval)
 

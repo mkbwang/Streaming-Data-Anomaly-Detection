@@ -7,6 +7,8 @@ import io
 import jidp
 import base64
 import json
+from datetime import datetime
+from datetime import timedelta
 import psycopg2 as pg
 from flask import jsonify
 
@@ -14,10 +16,17 @@ from flask import jsonify
 def get_anomaly():
     conn = pg.connect("dbname=anomalydb user=wmk")
     cur = conn.cursor()
-    cur.execute("SELECT * FROM rainfall WHERE anomalytype = 'threshold' ORDER BY inserttime DESC;")
-    threshold = cur.fetchone()
-    cur.execute("SELECT * FROM rainfall WHERE anomalytype = 'statistical' ORDER BY inserttime DESC;")
-    statistical = cur.fetchone()
+    nowtime = datetime.now()
+    previoustime = nowtime - timedelta(seconds=3)
+    timerestraint = "(inserttime BETWEEN '"+previoustime.strftime("%Y-%m-%d %H:%M:%S")+"' AND '"+nowtime.strftime("%Y-%m-%d %H:%M:%S")+"')"
+    querystring1 = "SELECT * FROM rainfall WHERE (anomalytype = 'threshold') AND "+timerestraint+" ORDER BY value DESC LIMIT 50"
+    querystring2 = "SELECT * FROM rainfall WHERE (anomalytype = 'statistical') AND "+timerestraint+" ORDER BY value DESC LIMIT 50"
+    cur.execute(querystring1)
+    threshold = cur.fetchall()
+    a1 = [data[2] for data in threshold]
+    cur.execute(querystring2)
+    statistical = cur.fetchall()
+    a2 = [data[2] for data in statistical]
     cur.close()
     conn.close()
     # directory = jidp.model.get_rainfall() # get the directory
@@ -29,5 +38,5 @@ def get_anomaly():
     # a2_directory = os.path.join(directory, a2)
     # with open(a2_directory, 'r') as f:
     #     anomaly2 = json.load(f)
-    output = {"a1": threshold[2], "a2": statistical[2]}
+    output = {"a1": a1, "a2": a2}
     return jsonify(output), 200
