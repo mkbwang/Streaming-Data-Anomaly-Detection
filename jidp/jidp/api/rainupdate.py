@@ -7,7 +7,7 @@ import io
 import jidp
 import base64
 import json
-import urllib.request as urllib2
+import urllib3
 from flask import jsonify
 
 @jidp.app.route('/api/rainupdate/',methods=["POST", "GET"])
@@ -21,14 +21,14 @@ def get_rainupdate():
         return jsonify(output), 200
     else:
         # update the rain threshold
+        http = urllib3.PoolManager()
         feedback = flask.request.get_json()
-        feedback["topic"] = "weatherdata"
-        feedback["window"] = 3000
-        feedback["type"] = "anomaly_0"
-        with open(tempthreshold, "w+") as f:
-            json.dump(feedback, f)
-        headers = {'Content-Type': 'application/json'}
-        request = urllib2.Request(url='localhost:8080/api_v1/job/', headers=headers, data=json.dumps(feedback))
-        response = urllib2.urlopen(request)
+        data = {'type':'update', 'ID':0, 'window':2000, "threshold":int(feedback["threshold"])}
+        encoded_data = json.dumps(data).encode('utf-8')
+        r = http.request(
+            'POST',
+            '127.0.0.1:8080/api_v1/job',
+            body=encoded_data,
+            headers={'Content-Type': 'application/json'})
         output = {"status":"good"}
         return jsonify(output), 201

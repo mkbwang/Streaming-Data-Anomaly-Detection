@@ -7,6 +7,7 @@ import io
 import jidp
 import base64
 import json
+import urllib3
 from flask import jsonify
 
 @jidp.app.route('/api/othersupdate/',methods=["POST", "GET"])
@@ -36,5 +37,32 @@ def get_othersupdate():
         # store the new standards
         with open(tempstandard, "w+") as f:
             json.dump(standard, f)
+        if standard["brand"]:
+            http = urllib3.PoolManager()
+            data = {'type': 'update', 'ID' : 5, 'window' : 2000, 'threshold' : feedback["brand"]}
+            encoded_data = json.dumps(data).encode('utf-8')
+            r = http.request(
+                'POST',
+                '127.0.0.1:8080/api_v1/job',
+                body=encoded_data,
+                headers={'Content-Type': 'application/json'})
+        if standard["product"]:
+            http = urllib3.PoolManager()
+            data = {'type': 'update', 'ID' : 6, 'window' : 2000, 'threshold' : feedback["product"]}
+            encoded_data = json.dumps(data).encode('utf-8')
+            r = http.request(
+                'POST',
+                '127.0.0.1:8080/api_v1/job',
+                body=encoded_data,
+                headers={'Content-Type': 'application/json'})
+        if standard["category"]:
+            http = urllib3.PoolManager()
+            data = {'type': 'update', 'ID' : 7, 'window' : 2000, 'threshold' : feedback["category"]}
+            encoded_data = json.dumps(data).encode('utf-8')
+            r = http.request(
+                'POST',
+                '127.0.0.1:8080/api_v1/job',
+                body=encoded_data,
+                headers={'Content-Type': 'application/json'})
         output = {"status":"good"}
         return jsonify(output), 201

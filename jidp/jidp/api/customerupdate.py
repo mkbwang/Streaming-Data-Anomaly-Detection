@@ -8,6 +8,7 @@ import jidp
 import base64
 import json
 import pickle
+import urllib3
 from flask import jsonify
 
 @jidp.app.route('/api/customerupdate/',methods=["POST", "GET"])
@@ -37,5 +38,32 @@ def get_customerupdate():
         # store the new standards
         with open(tempstandard, "w+") as f:
             json.dump(standard, f)
+        if standard["userbrand"]:
+            http = urllib3.PoolManager()
+            data = {'type': 'update', 'ID' : 2, 'window' : 2000, 'threshold' : int(feedback["userbrand"])}
+            encoded_data = json.dumps(data).encode('utf-8')
+            r = http.request(
+                'POST',
+                '127.0.0.1:8080/api_v1/job',
+                body=encoded_data,
+                headers={'Content-Type': 'application/json'})
+        if standard["userproduct"]:
+            http = urllib3.PoolManager()
+            data = {'type': 'update', 'ID' : 3, 'window' : 2000, 'threshold' : int(feedback["userproduct"])}
+            encoded_data = json.dumps(data).encode('utf-8')
+            r = http.request(
+                'POST',
+                '127.0.0.1:8080/api_v1/job',
+                body=encoded_data,
+                headers={'Content-Type': 'application/json'})
+        if standard["usercategory"]:
+            http = urllib3.PoolManager()
+            data = {'type': 'update', 'ID' : 4, 'window' : 2000, 'threshold' : int(feedback["usercategory"])}
+            encoded_data = json.dumps(data).encode('utf-8')
+            r = http.request(
+                'POST',
+                '127.0.0.1:8080/api_v1/job',
+                body=encoded_data,
+                headers={'Content-Type': 'application/json'})
         output = {"status":"good"}
         return jsonify(output), 201

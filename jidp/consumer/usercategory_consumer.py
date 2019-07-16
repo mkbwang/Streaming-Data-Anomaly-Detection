@@ -7,7 +7,7 @@ consumer = KafkaConsumer('anomaly_4',
                          bootstrap_servers=['localhost:9092'])
 
 for message in consumer:
-    newid = message.key.decode('utf-8')
+    newid = message.key.decode('utf-8')[1:].split('@')[0]
     newval = int(message.value.decode('utf-8'))
     date_object = datetime.now()
     current_time = date_object.strftime('%Y-%m-%d %H:%M:%S')
