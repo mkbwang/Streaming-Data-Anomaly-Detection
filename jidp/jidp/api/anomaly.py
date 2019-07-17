@@ -17,10 +17,10 @@ def get_anomaly():
     conn = pg.connect("dbname=anomalydb user=wmk")
     cur = conn.cursor()
     nowtime = datetime.now()
-    previoustime = nowtime - timedelta(seconds=3)
+    previoustime = nowtime - timedelta(seconds=2.3)
     timerestraint = "(inserttime BETWEEN '"+previoustime.strftime("%Y-%m-%d %H:%M:%S")+"' AND '"+nowtime.strftime("%Y-%m-%d %H:%M:%S")+"')"
-    querystring1 = "SELECT * FROM rainfall WHERE (anomalytype = 'threshold') AND "+timerestraint+" ORDER BY value DESC LIMIT 50"
-    querystring2 = "SELECT * FROM rainfall WHERE (anomalytype = 'statistical') AND "+timerestraint+" ORDER BY value DESC LIMIT 50"
+    querystring1 = "SELECT * FROM rainfall WHERE (anomalytype = 'threshold') AND "+timerestraint+" ORDER BY value DESC LIMIT 200"
+    querystring2 = "SELECT * FROM rainfall WHERE (anomalytype = 'statistical') AND "+timerestraint+" ORDER BY value DESC LIMIT 200"
     cur.execute(querystring1)
     threshold = cur.fetchall()
     a1 = [data[2] for data in threshold]

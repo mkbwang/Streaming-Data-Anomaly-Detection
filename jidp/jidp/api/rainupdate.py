@@ -30,5 +30,7 @@ def get_rainupdate():
             '127.0.0.1:8080/api_v1/job',
             body=encoded_data,
             headers={'Content-Type': 'application/json'})
+        with open(tempthreshold, 'w+') as f:
+            json.dump(data, f)
         output = {"status":"good"}
         return jsonify(output), 201

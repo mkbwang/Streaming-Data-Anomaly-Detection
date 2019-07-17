@@ -59,6 +59,6 @@ $(document).ready(function(){
             }
         });
     }
-    setInterval(askforalert, 2000);
+    setInterval(askforalert, 1673);
     askforalert();
 });

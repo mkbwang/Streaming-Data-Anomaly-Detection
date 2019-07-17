@@ -1,1 +1,1 @@
-{"threshold": "5", "topic": "weatherdata", "window": 3000, "type": "anomaly_0"}
+{"type": "update", "ID": 0, "window": 2000, "threshold": 6}
