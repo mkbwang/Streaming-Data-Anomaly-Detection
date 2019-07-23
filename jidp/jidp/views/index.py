@@ -18,3 +18,13 @@ import jidp
 def show_index():
     """Display / route."""
     return flask.render_template("index.html")
+
+@jidp.app.route('/index', methods=['GET'])
+def index():
+    """Display / route."""
+    return flask.render_template("index.html")
+
+@jidp.app.route('/taobao', methods=['GET'])
+def taobao():
+    """Display / route."""
+    return flask.render_template("taobao.html")
