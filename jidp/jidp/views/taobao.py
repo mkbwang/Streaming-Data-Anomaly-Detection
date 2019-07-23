@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import jidp
 
 
-@jidp.app.route('/taobao.html', methods=['GET'])
-def show_index():
+@jidp.app.route('/taobao', methods=['GET'])
+def show_taobao():
     """Display / route."""
     return flask.render_template("taobao.html")
