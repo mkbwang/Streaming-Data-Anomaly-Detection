@@ -43,9 +43,9 @@ $(document).ready(function(){
                 contentType: 'application/json',
                 data:JSON.stringify(customer),
                 success:function(result){},
-                error:function(XMLHttpRequest){
+                error:function(msg){
                     // alert("Fail to send the message!");
-                    alert(XMLHttpRequest.status);
+                    alert(msg);
                 }
             });
         }
