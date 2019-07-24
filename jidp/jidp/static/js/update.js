@@ -43,7 +43,7 @@ $(document).ready(function(){
                 contentType: 'application/json',
                 data:JSON.stringify(customer),
                 success:function(result){},
-                error:function(msg){
+                error:function(XMLHttpRequest){
                     // alert("Fail to send the message!");
                     alert(XMLHttpRequest.status);
                 }
