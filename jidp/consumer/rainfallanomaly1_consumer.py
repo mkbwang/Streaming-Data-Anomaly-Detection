@@ -13,16 +13,15 @@ for message in consumer:
     # print("new message coming")
     newkey = message.key.decode('utf-8')
     newkey = int(newkey[1:].split('@')[0])
-    newval = int(float(message.value.decode('utf-8')))
-    pointlist = [newkey//501, newkey%501]
+    newval = int(float(message.value.decode('utf-8').split(':')[0]))
+    newthreshold = int(float(message.value.decode('utf-8').split(':')[1]))
+    pointlist = [newkey%100, newkey//100]
     conn = pg.connect("dbname=anomalydb user=wmk")
     cur = conn.cursor()
     date_object = datetime.now()
-    current_time = date_object.strftime('%Y-%m-%d %H:%M:%S')
-    with open('../temporary/rainthreshold.json') as f:
-        threshold = json.load(f)
+    current_time = date_object.strftime('%Y-%m-%d %H:%M:%S.%f')
     cur.execute("INSERT INTO rainfall (inserttime, anomalytype, points, threshold, value) VALUES(%s, %s, %s, %s, %s)",
-                (current_time, "threshold", pointlist, threshold["threshold"], newval))
+                (current_time, "threshold", pointlist, newthreshold, newval))
     conn.commit()
     cur.close()
     conn.close()

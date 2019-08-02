@@ -15,7 +15,7 @@ def csv_reader(name):
     in_csv = open("/mnt/taobao/" + name + ".csv")
     reader = csv.reader(in_csv)
     for in_line in reader:
-        if line > 40000:
+        if line > 60000:
             in_csv.seek(1)
             line=1
         if line == 0:

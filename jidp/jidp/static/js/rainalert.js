@@ -1,8 +1,8 @@
 $(document).ready(function(){
     $( "#rainthreshold" ).slider({
         range: "max",
-        min: 5,
-        max: 25,
+        min: 10,
+        max: 40,
         slide: function( event, ui ) {
           $( "#currbar" ).val( ui.value );
         }
@@ -21,27 +21,39 @@ $(document).ready(function(){
         let anomalychart = echarts.init(document.getElementById('anomalyalert'));
         let option = {
             xAxis: {
-                scale: false
+                scale: false,
+                "axisTick": {
+                    "show": false
+                },
+                "axisLine": {      
+                    "show": false
+                }
             },
             yAxis: {
                 scale: false,
                 inverse: true,
+                "axisTick": { 
+                    "show": false
+                },
+                "axisLine": { 
+                    "show": false
+                }
             },
             series: [{
                 type: 'effectScatter',
-                symbolSize: 5,
+                symbolSize: 6,
                 color:"#ca8622",
                 data: [
                 ]
             }, 
             {
                 type: 'effectScatter',
-                symbolSize: 5,
+                symbolSize: 6,
                 data: [
                 ]
             },{
                 type: 'scatter',
-                data: [[500, 0], [0, 500], [500, 500], [0, 0]
+                data: [[100, 0], [0, 100], [100, 100], [0, 0]
                 ],
             }]
         };
@@ -59,6 +71,6 @@ $(document).ready(function(){
             }
         });
     }
-    setInterval(askforalert, 1673);
+    setInterval(askforalert, 3000);
     askforalert();
 });

@@ -17,4 +17,8 @@ jidp/jidp.sock
 jidp/temporary/currentrain.npy
 jidp/temporary/example.npy
 *.out
-
+jidp/consumer/test.txt
+jidp/consumer/trial.py
+jidp/jidp/api/trial.py
+jidp/jidp/api/trial.txt
+jidp/consumer/pointtest.txt

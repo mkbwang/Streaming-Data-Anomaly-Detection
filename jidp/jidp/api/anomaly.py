@@ -17,10 +17,12 @@ def get_anomaly():
     conn = pg.connect("dbname=anomalydb user=wmk")
     cur = conn.cursor()
     nowtime = datetime.now()
-    previoustime = nowtime - timedelta(seconds=2.3)
-    timerestraint = "(inserttime BETWEEN '"+previoustime.strftime("%Y-%m-%d %H:%M:%S")+"' AND '"+nowtime.strftime("%Y-%m-%d %H:%M:%S")+"')"
-    querystring1 = "SELECT * FROM rainfall WHERE (anomalytype = 'threshold') AND "+timerestraint+" ORDER BY value DESC LIMIT 200"
-    querystring2 = "SELECT * FROM rainfall WHERE (anomalytype = 'statistical') AND "+timerestraint+" ORDER BY value DESC LIMIT 200"
+    previoustime1 = nowtime - timedelta(seconds=6)
+    previoustime2 = nowtime - timedelta(seconds=6)
+    timerestraint1 = "(inserttime BETWEEN '"+previoustime1.strftime("%Y-%m-%d %H:%M:%S.%f")+"' AND '"+nowtime.strftime("%Y-%m-%d %H:%M:%S.%f")+"')"
+    timerestraint2 = "(inserttime BETWEEN '"+previoustime2.strftime("%Y-%m-%d %H:%M:%S.%f")+"' AND '"+nowtime.strftime("%Y-%m-%d %H:%M:%S.%f")+"')"
+    querystring1 = "SELECT * FROM rainfall WHERE (anomalytype = 'threshold') AND "+timerestraint1+" ORDER BY VALUE DESC LIMIT 1000"
+    querystring2 = "SELECT * FROM rainfall WHERE (anomalytype = 'statistical') AND "+timerestraint2+" ORDER BY RANDOM() DESC LIMIT 400"
     cur.execute(querystring1)
     threshold = cur.fetchall()
     a1 = [data[2] for data in threshold]

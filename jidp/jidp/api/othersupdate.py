@@ -27,12 +27,14 @@ def get_othersupdate():
         return jsonify(initialstate), 200
     else: # post request, user change threshold
         feedback = flask.request.get_json()
+        with open(tempthreshold, 'r') as f:
+            threshold = json.load(f)
         for key in feedback:
-            feedback[key] = int(feedback[key])
+            threshold[key] = int(feedback[key])
             standard[key] = True
         # store the new others threshold in a temporary json file
         with open(tempthreshold, "w+") as f:
-            json.dump(feedback, f)
+            json.dump(threshold, f)
         # TODO: add how to communicate with kafka
         # store the new standards
         with open(tempstandard, "w+") as f:

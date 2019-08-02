@@ -100,5 +100,4 @@ $(document).ready( function() {
     customertable();
     setInterval(otherstable,1000);
     otherstable();
-    
 } );

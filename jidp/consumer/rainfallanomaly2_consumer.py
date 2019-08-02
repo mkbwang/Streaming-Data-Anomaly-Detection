@@ -14,12 +14,12 @@ mykey = ""
 for message in consumer:
     # print("new message coming")
     newkey = message.key.decode('utf-8')
-    newkey = int(newkey[1:].split('@')[0])
-    pointlist = [newkey//501, newkey%501]
+    newkey = int(newkey)
+    pointlist = [newkey%100, newkey//100]
     conn = pg.connect("dbname=anomalydb user=wmk")
     cur = conn.cursor()
     date_object = datetime.now()
-    current_time = date_object.strftime('%Y-%m-%d %H:%M:%S')
+    current_time = date_object.strftime('%Y-%m-%d %H:%M:%S.%f')
     cur.execute("INSERT INTO rainfall (inserttime, anomalytype, points) VALUES(%s, %s, %s)",
                 (current_time, "statistical", pointlist))
     conn.commit()
