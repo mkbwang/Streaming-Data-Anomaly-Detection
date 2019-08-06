@@ -1,10 +1,12 @@
-package datapipeline;
+package datapipeline.streamer;
 
 import com.google.gson.Gson;
+import datapipeline.KafkaConstants;
+import datapipeline.KafkaManager;
 import datapipeline.common.Tuple2;
 import datapipeline.common.Tuple2Serde;
-import datapipeline.processors.ControlledFilterTransformer;
-import datapipeline.streamer.ControlledFilterWrapper;
+import datapipeline.processors.BooleanLogicTransformer;
+import datapipeline.processors.OutlierTransformer;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.utils.Bytes;
@@ -21,10 +23,14 @@ import org.apache.kafka.streams.state.WindowStore;
 import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 
-public class Test {
-    public static void main(String[] args) {
+public class RunningMeanVarTest {
+
+    public static void main(String[] argv) {
+
+        int _ID = 0;
 
         final Properties streamsConfiguration = new Properties();
         final Serde<String> stringSerde = Serdes.String();
@@ -32,54 +38,51 @@ public class Test {
 
         // Give the Streams application a unique name.  The name must be unique in the Kafka cluster
         // against which the application is run.
-        streamsConfiguration.put(StreamsConfig.APPLICATION_ID_CONFIG, KafkaConstants.STREAMER_PREFIX + 0);
-        streamsConfiguration.put(StreamsConfig.CLIENT_ID_CONFIG, KafkaConstants.STREAMER_PREFIX + 0);
+        streamsConfiguration.put(StreamsConfig.APPLICATION_ID_CONFIG, KafkaConstants.STREAMER_PREFIX + _ID);
+        streamsConfiguration.put(StreamsConfig.CLIENT_ID_CONFIG, KafkaConstants.STREAMER_PREFIX + _ID);
 
-        KafkaManager km = KafkaManager.getInstance();
-        KafkaManager.deleteTopicWithPrefix(KafkaConstants.STREAMER_PREFIX + 0);
-        KafkaManager.deleteTopicWithPrefix("control_application_" + 0);
-        KafkaManager.createTopic("control_application_" + 0, 1, (short) 1);
-
+        KafkaManager m = KafkaManager.getInstance();
+        KafkaManager.deleteTopicWithPrefix(KafkaConstants.STREAMER_PREFIX + _ID);
         // Where to find Kafka broker(s).
         streamsConfiguration.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaConstants.KAFKA_BROKERS);
 
         // Specify default (de)serializers for record keys and for record values.
         streamsConfiguration.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());
         streamsConfiguration.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName()); // Set the commit interval to 500ms so that any changes are flushed frequently. The low latency
+
+
         streamsConfiguration.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, 0);
 
-
         final StreamsBuilder builder = new StreamsBuilder();
+
 
         //final KStream<String, String> view_1 = builder.stream("Boolean_test_0");
         final KStream<String, String> view = builder.stream("test");
 
 
-        ControlledFilterWrapper<String, String> wrapper = new ControlledFilterWrapper<>();
-
-        KStream<String, String> mappedStream = view
+        KStream<String, Integer> mappedStream = view
                 .flatMap((k, v) -> {
-                    List<KeyValue<String, String>> result = new LinkedList<>();
+                    List<KeyValue<String, Integer>> result = new LinkedList<>();
 
                     Gson gson = new Gson();
                     int[] value = gson.fromJson(v, int[].class);
 
                     for (int i = 0; i < value.length; i++) {
-                        result.add(new KeyValue<>(Integer.toString(i), Integer.toString(value[i])));
+                        result.add(new KeyValue<>(Integer.toString(i), value[i]));
                         // KafkaManager.createTopic(job_id, this._ID,(short)1);
                     }
                     return result;
                 });
 
-        KGroupedStream<String, String> groupedStream = mappedStream.groupByKey(Grouped.with(stringSerde, stringSerde));
-        TimeWindowedKStream<String, String> windowedStream = groupedStream.windowedBy(TimeWindows.of(Duration.ofMillis(100)).grace(Duration.ofMillis((long)(100 * 0.1))));
+        KGroupedStream<String, Integer> groupedStream = mappedStream.groupByKey(Grouped.with(stringSerde, Serdes.Integer()));
+        TimeWindowedKStream <String, Integer> windowedStream = groupedStream.windowedBy(TimeWindows.of(Duration.ofMillis(2000)).grace(Duration.ofMillis((long)(2000 * 0.1))));
         KTable<Windowed<String>, Tuple2<Double, Double>> aggregatedStream = windowedStream
                 .aggregate(
                         () -> new Tuple2<>(0.0, 0.0),
                         (aggKey, newValue, aggregate)  -> {
                             aggregate.value1 ++;
                             try{
-                                aggregate.value2 += Integer.parseInt(newValue);
+                                aggregate.value2 += (double) newValue;
                             } catch(Exception e) {
 
                             }
@@ -89,27 +92,45 @@ public class Test {
                 )
                 .suppress(Suppressed.untilWindowCloses(Suppressed.BufferConfig.unbounded()));
 
-        KStream<String, String> anomalousData = aggregatedStream
-                .mapValues(value -> Double.toString(value.value2 / value.value1))
+        KStream<String, String> anomalousData = aggregatedStream.mapValues(value -> Double.toString(value.value2 / value.value1))
+                //.filter((key, value) -> Double.parseDouble(value) > (double)_threshold)
                 .toStream()
-                .map((key, value) -> new KeyValue<>(key.toString(), value));
+                .map((k, v) -> KeyValue.pair(k.key(), v));
 
 
-        wrapper.getControlledStream(anomalousData
-                , builder
-                , KafkaConstants.CONTROL_FLOW_TOPIC_PREFIX + 0
-                , new ControlledFilterTransformer<>(0, 8)
-                ,0)
-                .to("anomaly_0");
+        //final KStream<String, String> merged = view.merge(view_2);
 
+        StoreBuilder<KeyValueStore<String, Double>> booleanLogicStore = Stores.keyValueStoreBuilder(
+                Stores.persistentKeyValueStore(KafkaConstants.CONTROL_INFO_PREFIX + _ID),
+                stringSerde,
+                doubleSerde
+        );
+
+        KeyValueStore kvStore =  booleanLogicStore.build();
+        builder.addStateStore(booleanLogicStore);
+        /*KStream<String, String> outputStream = merged.transform(new TransformerSupplier<String, String, KeyValue<String, String>>() {
+            public Transformer get() {
+                return new BooleanLogicTransformer(2);
+            }
+        }, "BooleanLogic_1");*/
+
+        KStream<String, String> outputStream = anomalousData.transform( () -> {
+                    return new OutlierTransformer<>(2, _ID, 1);
+                }
+                , KafkaConstants.CONTROL_INFO_PREFIX + _ID);
+        outputStream.to(KafkaConstants.STREAMER_OUTPUT_TOPIC_PREFIX + _ID);
 
         final KafkaStreams streams = new KafkaStreams(builder.build(), streamsConfiguration);
+
 
         streams.cleanUp();
         streams.start();
 
-        // Add shutdown hook to respond to SIGTERM and gracefully close Kafka Streams
+
         Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
+
+
+
 
         while (true) {
             try {
