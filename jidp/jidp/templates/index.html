@@ -25,7 +25,10 @@
     <script type="text/javascript" src="{{url_for('static',filename='js/bootstrap.min.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static',filename='js/jquery-ui.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static',filename='js/bootstrap-multiselect.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static',filename='js/echarts.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static',filename='js/rainfall.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static',filename='js/rainalert.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static',filename='js/taobao.js')}}"></script>
 </head>
 
 <body>
@@ -75,16 +78,48 @@
                 <h3>
                     <a>Most Recent Rainfall Heatmap</a>
                 </h3>
-                <p>This most recent rainfall heatmap is updated every three seconds.</p>
+                <p>This most recent rainfall heatmap is updated every one second.</p>
             </div>
             <div class="col-md-6 portfolio-item">
-                <a href="#">
-                    <img id="anomalyalert" class="img-responsive" src="" alt="No plot generated yet" width="70%" height="70%" />
-                </a>
+                <div id="anomalyalert" style="height:300%;width:75%;"></div>
                 <h3>
                     <a>Anomaly Alert</a>
                 </h3>
-                <p>This plot updates the positions where average rainfall exceeds 7 every 20 seconds.</p>
+                <p>This plot updates the positions where average rainfall exceeds 15 every 30 seconds.</p>
+            </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header">Anomaly Detection for Taobao Customer Data 
+                    </h1>
+                </div>
+            </div>
+            <div class="row">
+            <div class="col-md-6 portfolio-item">
+                <h2>Anomaly Customers</h2>
+                <fieldset>
+                <legend>Hotel Ratings: </legend>
+                <label for="checkbox-1">2 Star</label>
+                <input type="checkbox" name="checkbox-1" id="checkbox-1">
+                <label for="checkbox-2">3 Star</label>
+                <input type="checkbox" name="checkbox-2" id="checkbox-2">
+                <label for="checkbox-3">4 Star</label>
+                <input type="checkbox" name="checkbox-3" id="checkbox-3">
+                <label for="checkbox-4">5 Star</label>
+                <input type="checkbox" name="checkbox-4" id="checkbox-4">
+                </fieldset>
+            </div>
+            <div class="col-md-6 portfolio-item">
+                <h2>Anomaly Brands/</h2>
+                <fieldset>
+                    <legend>Select your interested Statistical Rules: </legend>
+                    <label for="radio-1">New York</label>
+                    <input type="radio" name="radio-1" id="radio-1">
+                    <label for="radio-2">Paris</label>
+                    <input type="radio" name="radio-1" id="radio-2">
+                    <label for="radio-3">London</label>
+                    <input type="radio" name="radio-1" id="radio-3">
+                </fieldset>
             </div>
             </div>
         </div>

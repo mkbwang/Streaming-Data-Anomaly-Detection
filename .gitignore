@@ -3,7 +3,9 @@ env/
 jidp/jidp.egg-info/
 kafka_2.12-2.2.0/
 .vscode
-jidp/__pycache__/
+jidp/jidp/__pycache__/
+jidp/jidp/api/__pycache__/
+jidp/jidp/views/__pycache__/
 .gradle/
 .idea/
 .DS_store
