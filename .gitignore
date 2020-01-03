@@ -16,6 +16,3 @@ jidp/jidp.sock
 jidp/temporary/currentrain.npy
 jidp/temporary/example.npy
 *.out
-jidp/jidp/static/js/bootstrap*
-jidp/jidp/static/js/echarts*
-jidp/jidp/static/js/jquery*
