@@ -1,10 +1,9 @@
-package datapipeline;
+package datapipeline.streamer;
 
 import com.google.gson.Gson;
+import datapipeline.KafkaConstants;
 import datapipeline.common.Tuple2;
 import datapipeline.common.Tuple2Serde;
-import datapipeline.processors.ControlledFilterTransformer;
-import datapipeline.streamer.ControlledFilterWrapper;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.utils.Bytes;
@@ -13,9 +12,6 @@ import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.*;
-import org.apache.kafka.streams.state.KeyValueStore;
-import org.apache.kafka.streams.state.StoreBuilder;
-import org.apache.kafka.streams.state.Stores;
 import org.apache.kafka.streams.state.WindowStore;
 
 import java.time.Duration;
@@ -23,22 +19,28 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
-public class Test {
-    public static void main(String[] args) {
+public class RollingAverageLamda {
 
+    private int _ID;
+    private int _threshold;
+    private String _topic;
+    private int _window;
+
+    public RollingAverageLamda(int ID, int threshold, String topic, int window) {
+        _ID = ID;
+        _threshold = threshold;
+        _topic = topic;
+        _window = window;
+    }
+
+    public void run() {
         final Properties streamsConfiguration = new Properties();
         final Serde<String> stringSerde = Serdes.String();
-        final Serde<Double> doubleSerde = Serdes.Double();
 
         // Give the Streams application a unique name.  The name must be unique in the Kafka cluster
         // against which the application is run.
-        streamsConfiguration.put(StreamsConfig.APPLICATION_ID_CONFIG, KafkaConstants.STREAMER_PREFIX + 0);
-        streamsConfiguration.put(StreamsConfig.CLIENT_ID_CONFIG, KafkaConstants.STREAMER_PREFIX + 0);
-
-        KafkaManager km = KafkaManager.getInstance();
-        KafkaManager.deleteTopicWithPrefix(KafkaConstants.STREAMER_PREFIX + 0);
-        KafkaManager.deleteTopicWithPrefix("control_application_" + 0);
-        KafkaManager.createTopic("control_application_" + 0, 1, (short) 1);
+        streamsConfiguration.put(StreamsConfig.APPLICATION_ID_CONFIG, "anomaly-detection-streamer-application-" + _ID);
+        streamsConfiguration.put(StreamsConfig.CLIENT_ID_CONFIG, "anomaly-detection-streamer-" + _ID);
 
         // Where to find Kafka broker(s).
         streamsConfiguration.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaConstants.KAFKA_BROKERS);
@@ -46,33 +48,34 @@ public class Test {
         // Specify default (de)serializers for record keys and for record values.
         streamsConfiguration.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());
         streamsConfiguration.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName()); // Set the commit interval to 500ms so that any changes are flushed frequently. The low latency
+
+        // would be important for anomaly detection.
+        //streamsConfiguration.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, 100);
         streamsConfiguration.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, 0);
 
 
         final StreamsBuilder builder = new StreamsBuilder();
 
-        //final KStream<String, String> view_1 = builder.stream("Boolean_test_0");
-        final KStream<String, String> view = builder.stream("test");
 
+        final KStream<String, String> views = builder.stream(_topic);
 
-        ControlledFilterWrapper<String, String> wrapper = new ControlledFilterWrapper<>();
-
-        KStream<String, String> mappedStream = view
+        KStream<String, String> mappedStream = views
                 .flatMap((k, v) -> {
                     List<KeyValue<String, String>> result = new LinkedList<>();
 
                     Gson gson = new Gson();
-                    int[] value = gson.fromJson(v, int[].class);
+                    int[][] value = gson.fromJson(v, int[][].class);
 
                     for (int i = 0; i < value.length; i++) {
-                        result.add(new KeyValue<>(Integer.toString(i), Integer.toString(value[i])));
-                        // KafkaManager.createTopic(job_id, this._ID,(short)1);
+                        for (int j = 0; j < value[i].length; j++) {
+                            result.add(new KeyValue<>(Integer.toString(i * value[i].length + j), value[i][j] + ";" + k));
+                        }
                     }
                     return result;
                 });
 
         KGroupedStream<String, String> groupedStream = mappedStream.groupByKey(Grouped.with(stringSerde, stringSerde));
-        TimeWindowedKStream<String, String> windowedStream = groupedStream.windowedBy(TimeWindows.of(Duration.ofMillis(100)).grace(Duration.ofMillis((long)(100 * 0.1))));
+        TimeWindowedKStream <String, String> windowedStream = groupedStream.windowedBy(TimeWindows.of(Duration.ofSeconds(_window)).grace(Duration.ofSeconds(1)));
         KTable<Windowed<String>, Tuple2<Double, Double>> aggregatedStream = windowedStream
                 .aggregate(
                         () -> new Tuple2<>(0.0, 0.0),
@@ -89,34 +92,28 @@ public class Test {
                 )
                 .suppress(Suppressed.untilWindowCloses(Suppressed.BufferConfig.unbounded()));
 
-        KStream<String, String> anomalousData = aggregatedStream
-                .mapValues(value -> Double.toString(value.value2 / value.value1))
+        KStream<String, String> anmalousData = aggregatedStream.mapValues(value -> Double.toString(value.value2 / value.value1))
+                .filter((key, value) -> Double.parseDouble(value) > (double)_threshold)
                 .toStream()
-                .map((key, value) -> new KeyValue<>(key.toString(), value));
+                .filter((key, value) ->  value != null)
+                .map(((key, value) -> KeyValue.pair(key.toString(), key.key())));
 
-
-        wrapper.getControlledStream(anomalousData
-                , builder
-                , KafkaConstants.CONTROL_FLOW_TOPIC_PREFIX + 0
-                , new ControlledFilterTransformer<>(0, 8)
-                ,0)
-                .to("anomaly_0");
-
-
+        anmalousData.to("notification_job_" + _ID);
         final KafkaStreams streams = new KafkaStreams(builder.build(), streamsConfiguration);
-
+        // Always (and unconditionally) clean local state prior to starting the processing topology.
+        // We opt for this unconditional call here because this will make it easier for you to play around with the example
+        // when resetting the application for doing a re-run (via the Application Reset Tool,
+        // http://docs.confluent.io/current/streams/developer-guide.html#application-reset-tool).
+        //
+        // The drawback of cleaning up local state prior is that your app must rebuilt its local state from scratch, which
+        // will take time and will require reading all the state-relevant data from the Kafka cluster over the network.
+        // Thus in a production scenario you typically do not want to clean up always as we do here but rather only when it
+        // is truly needed, i.e., only under certain conditions (e.g., the presence of a command line flag for your app).
+        // See `ApplicationResetExample.java` for a production-like example.
         streams.cleanUp();
         streams.start();
 
         // Add shutdown hook to respond to SIGTERM and gracefully close Kafka Streams
         Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
-
-        while (true) {
-            try {
-                Thread.sleep(10000000);
-            } catch (Exception e) {
-
-            }
-        }
     }
 }

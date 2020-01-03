@@ -1,7 +1,7 @@
 package datapipeline.streamer;
 
 import datapipeline.KafkaConstants;
-import datapipeline.processors.BooleanLogicProcessor;
+import datapipeline.processors.BooleanLogicTransformer;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
@@ -31,18 +31,14 @@ public class BooleanProcessorTestMain {
 
         // Where to find Kafka broker(s).
         streamsConfiguration.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaConstants.KAFKA_BROKERS);
-
         // Specify default (de)serializers for record keys and for record values.
         streamsConfiguration.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());
         streamsConfiguration.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName()); // Set the commit interval to 500ms so that any changes are flushed frequently. The low latency
 
-
         final StreamsBuilder builder = new StreamsBuilder();
-
 
         final KStream<String, String> view_1 = builder.stream("Boolean_test_0");
         final KStream<String, String> view_2 = builder.stream("Boolean_test_1");
-
 
 
         final KStream<String, String> merged = view_1.merge(view_2);
@@ -53,13 +49,18 @@ public class BooleanProcessorTestMain {
                 stringSerde
         );
 
+        KeyValueStore kvStore =  booleanLogicStore.build();
         builder.addStateStore(booleanLogicStore);
-        KStream<String, String> outputStream = merged.transform(new TransformerSupplier<String, String, KeyValue<String, String>>() {
+        /*KStream<String, String> outputStream = merged.transform(new TransformerSupplier<String, String, KeyValue<String, String>>() {
             public Transformer get() {
-                return new BooleanLogicProcessor(2);
+                return new BooleanLogicTransformer(2);
             }
-        }, "BooleanLogic_1");
+        }, "BooleanLogic_1");*/
 
+        KStream<String, String> outputStream = merged.transform( () -> {
+                return new BooleanLogicTransformer(2);
+            }
+        , "BooleanLogic_1");
         outputStream.to("result_boolean_0");
 
         final KafkaStreams streams = new KafkaStreams(builder.build(), streamsConfiguration);

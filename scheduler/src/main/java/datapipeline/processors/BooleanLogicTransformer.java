@@ -2,26 +2,22 @@ package datapipeline.processors;
 
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.kstream.Transformer;
-import org.apache.kafka.streams.kstream.TransformerSupplier;
-import org.apache.kafka.streams.processor.Processor;
 import org.apache.kafka.streams.processor.ProcessorContext;
 import org.apache.kafka.streams.processor.PunctuationType;
 import org.apache.kafka.streams.state.KeyValueIterator;
 import org.apache.kafka.streams.state.KeyValueStore;
-import scala.Array;
-import scala.Int;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BooleanLogicProcessor implements Transformer<String, String, KeyValue<String, String>> {
+public class BooleanLogicTransformer implements Transformer<String, String, KeyValue<String, String>> {
 
     private ProcessorContext context;
     private KeyValueStore<String, String> kvStore;
     private int ruleNum;
 
-    public BooleanLogicProcessor(int ruleNum) {
+    public BooleanLogicTransformer(int ruleNum) {
         this.ruleNum = ruleNum;
     }
 
@@ -29,6 +25,7 @@ public class BooleanLogicProcessor implements Transformer<String, String, KeyVal
     public void init(ProcessorContext context) {
         this.context = context;
         kvStore = (KeyValueStore) context.getStateStore("BooleanLogic_1");
+
         // schedule a punctuate() method every second based on event-time
         this.context.schedule(Duration.ofSeconds(1), PunctuationType.WALL_CLOCK_TIME, (timestamp) -> {
             KeyValueIterator<String, String> iter = this.kvStore.all();
