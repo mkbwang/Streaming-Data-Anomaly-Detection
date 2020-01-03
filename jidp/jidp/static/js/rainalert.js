@@ -1,27 +1,76 @@
 $(document).ready(function(){
-    var dom = document.getElementById("anomalyalert");
-    var myChart = echarts.init(dom);
-    option = {
-        xAxis: {
-            scale: false
-        },
-        yAxis: {
-            scale: false
-        },
-        series: [{
-            type: 'effectScatter',
-            symbolSize: 20,
-            data: [
-                [400, 105.2],
-                [153.4, 142]
-            ]
-        }, {
-            type: 'scatter',
-            data: [[500, 0], [0, 500], [500, 500], [0, 0]
-            ],
-        }]
-    };
-    if (option && typeof option === "object") {
-        myChart.setOption(option, true);
-    };
+    $( "#rainthreshold" ).slider({
+        range: "max",
+        min: 10,
+        max: 40,
+        slide: function( event, ui ) {
+          $( "#currbar" ).val( ui.value );
+        }
+      });
+    $( "#currbar" ).val( $( "#rainthreshold" ).slider( "value" ) );
+    $.ajax({
+        type:"get",
+        url:"/api/rainupdate/",
+        dataType : "json",
+        success: function(result){
+            $("#rainthreshold").slider('value',result.threshold);
+            $( "#currbar" ).val( result.threshold );
+        }
+    });
+    function askforalert(){
+        let anomalychart = echarts.init(document.getElementById('anomalyalert'));
+        let option = {
+            xAxis: {
+                scale: false,
+                "axisTick": {
+                    "show": false
+                },
+                "axisLine": {      
+                    "show": false
+                }
+            },
+            yAxis: {
+                scale: false,
+                inverse: true,
+                "axisTick": { 
+                    "show": false
+                },
+                "axisLine": { 
+                    "show": false
+                }
+            },
+            series: [{
+                type: 'effectScatter',
+                symbolSize: 6,
+                color:"#ca8622",
+                data: [
+                ]
+            }, 
+            {
+                type: 'effectScatter',
+                symbolSize: 6,
+                data: [
+                ]
+            },{
+                type: 'scatter',
+                data: [[100, 0], [0, 100], [100, 100], [0, 0]
+                ],
+            }]
+        };
+        $.ajax({
+            type: "get",
+            url: "/api/anomaly/",
+            dataType : "json",
+            success: function(result){
+                option['series'][0]['data'] = result.a1;
+                option['series'][1]['data'] = result.a2;
+                anomalychart.setOption(option);
+            },
+            error: function(errormsg){
+                console.log("fetch anomaly rainfall failed!");
+            }
+        });
+    }
+    setInterval(askforalert, 3000);
+    askforalert();
 });

@@ -16,9 +16,10 @@
 
     <!-- Custom CSS: You can use this stylesheet to override any Bootstrap styles and/or apply your own styles -->
     
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/css/bootstrap-multiselect.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
-    <!-- <link rel="stylesheet" href="{{url_for('static',filename='css/bootstrap-multiselect.css')}}"> -->
     <link href="{{url_for('static',filename='css/custom.css')}}" rel="stylesheet">
+    
 
     <!-- javascripts -->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -28,7 +29,9 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.6.0/echarts.min.js"></script>
     <script type="text/javascript" src="{{url_for('static',filename='js/rainfall.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static',filename='js/rainalert.js')}}"></script>
-    <script type="text/javascript" src="{{url_for('static',filename='js/taobao.js')}}"></script>
+    <!-- <script type="text/javascript" src="{{url_for('static',filename='js/taobao.js')}}"></script> -->
+    <script type="text/javascript" src="{{url_for('static',filename='js/update.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static',filename='js/table-renderer.js')}}"></script>
 </head>
 
 <body>
@@ -51,9 +54,8 @@
             <!-- Navbar links -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    <li>
-                        <a href="#">Home</a>
-                    </li>
+                    <li><a href="index">Rainfall</a></li>
+                    <li><a href="taobao">Taobao</a> </li>
                 </ul>
             </div>
             <!-- /.navbar-collapse -->
@@ -72,56 +74,28 @@
   
 		    <div class="row">
             <div class="col-md-6 portfolio-item">
-                <a href="#">
-                    <img id="currrainfall" class="img-responsive" src = "" alt="No plot generated yet" width="70%" height="70%"  />
-                </a>
                 <h3>
                     <a>Most Recent Rainfall Heatmap</a>
                 </h3>
-                <p>This most recent rainfall heatmap is updated every one second.</p>
+                <a href="#">
+                    <img id="currrainfall" class="img-responsive" src = "" alt="No plot generated yet" width="80%" height="80%"  />
+                </a>
+               <p>This most recent rainfall heatmap is updated every three seconds.</p>
             </div>
             <div class="col-md-6 portfolio-item">
-                <div id="anomalyalert" style="height:300%;width:75%;"></div>
                 <h3>
                     <a>Anomaly Alert</a>
                 </h3>
-                <p>This plot updates the positions where average rainfall exceeds 15 every 30 seconds.</p>
+                Current threshold: <input type="text" id="currbar" readonly style="border:0; color:#f6931f; font-weight:bold;">
+                <div id="rainthreshold"></div>
+                <br>
+                <button id="submit0" class="ui-button ui-widget ui-corner-all">Update Rule</button>
+                <div id="anomalyalert" style="height:300%;width:75%;"></div>
+                
+                <p>Orange points are those which exceeds the threshold above. Red points are those which exceeds the mean by twice the standard error based on historical data.</p>
             </div>
             </div>
-            <div class="row">
-                <div class="col-lg-12">
-                    <h1 class="page-header">Anomaly Detection for Taobao Customer Data 
-                    </h1>
-                </div>
-            </div>
-            <div class="row">
-            <div class="col-md-6 portfolio-item">
-                <h2>Anomaly Customers</h2>
-                <fieldset>
-                <legend>Hotel Ratings: </legend>
-                <label for="checkbox-1">2 Star</label>
-                <input type="checkbox" name="checkbox-1" id="checkbox-1">
-                <label for="checkbox-2">3 Star</label>
-                <input type="checkbox" name="checkbox-2" id="checkbox-2">
-                <label for="checkbox-3">4 Star</label>
-                <input type="checkbox" name="checkbox-3" id="checkbox-3">
-                <label for="checkbox-4">5 Star</label>
-                <input type="checkbox" name="checkbox-4" id="checkbox-4">
-                </fieldset>
-            </div>
-            <div class="col-md-6 portfolio-item">
-                <h2>Anomaly Brands/</h2>
-                <fieldset>
-                    <legend>Select your interested Statistical Rules: </legend>
-                    <label for="radio-1">New York</label>
-                    <input type="radio" name="radio-1" id="radio-1">
-                    <label for="radio-2">Paris</label>
-                    <input type="radio" name="radio-1" id="radio-2">
-                    <label for="radio-3">London</label>
-                    <input type="radio" name="radio-1" id="radio-3">
-                </fieldset>
-            </div>
-            </div>
+
         </div>
 		<!-- Center Column -->
 		<!--/container-fluid-->

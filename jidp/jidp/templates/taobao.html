@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<!-- Template by Quackit.com -->
+<!-- https://www.quackit.com/html/templates/simple_website_templates.cfm -->
+<!-- Start working on the new template and fonts-->
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+    <title>JI-DataPipeline</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="{{url_for('static',filename='css/bootstrap.min.css')}}" rel="stylesheet">
+
+    <!-- Custom CSS: You can use this stylesheet to override any Bootstrap styles and/or apply your own styles -->
+    
+    <link rel="stylesheet" href="{{url_for('static',filename='css/jquery-ui.min.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/bootstrap-multiselect.css')}}">
+    <link href="{{url_for('static',filename='css/custom.css')}}" rel="stylesheet">
+    
+
+    <!-- javascripts -->
+    <script type="text/javascript" src="{{url_for('static',filename='js/jquery.min.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static',filename='js/bootstrap.min.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static',filename='js/jquery-ui.min.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static',filename='js/bootstrap-multiselect.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static',filename='js/echarts.min.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static',filename='js/taobao.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static',filename='js/taobaoupdate.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static',filename='js/table-renderer.js')}}"></script>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <!-- Logo and responsive toggle -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">
+                	JI-DataPipeline
+                </a>
+            </div>
+            <!-- Navbar links -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li><a href="index">Rainfall</a></li>
+                    <li><a href="taobao">Taobao</a> </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+        <div class="container">
+            <!-- Heading -->
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header">Anomaly Detection for Taobao Customer Data 
+                    </h1>
+                </div>
+            </div>
+            <div class="row">
+            <div class="col-md-6 portfolio-item">
+                <h3><a>Anomaly Customers</a></h3>
+                <fieldset>
+                <b>Tick the rules that you are interested in:</b>
+                <br>
+                <input type="checkbox" id="c1"> Users who have clicked more than <input id="customer1" name="value"> brands recently.
+                <br>
+                <input type="checkbox" id="c2"> Users who have clicked more than <input id="customer2" name="value"> products recently.
+                <br>
+                <input type="checkbox" id="c3"> Users who have clicked more than <input id="customer3" name="value"> categories recently.
+                </fieldset>
+                <br>
+                <button id="submit1" class="ui-button ui-widget ui-corner-all">Update Rule</button>
+                <br>
+                <table width="90%" class="table" id="customertable">
+                    <thead><tr> <th>Timestamp</th> <th>User ID</th> <th>Anomaly Reason</th>  <th>Threshold</th> <th>Click #</th> </tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="col-md-6 portfolio-item">
+                <h3><a>Anomaly Brands/Products/Categories</a></h3>
+                <fieldset>
+                <b>Tick the rules that you are interested in:</b>
+                <br>
+                <input type="checkbox" id="wantbrand"> Brand that has been viewed more than <input id="brandspin" name="value"> times recently.
+                <br>
+                <input type="checkbox" id="wantproduct"> Product that has been viewed more than <input id="productspin" name="value"> times recently.
+                <br>
+                <input type="checkbox" id="wantcategory"> Category that has been viewed more than <input id="categoryspin" name="value"> times recently.
+                </fieldset>
+                <br>
+                <button id="submit2" class="ui-button ui-widget ui-corner-all">Update Rule</button>
+                <br>
+                <table width="90%" class="table" id="otherstable">
+                    <thead><tr> <th>Timestamp</th> <th>Case</th> <th>ID</th> <th>Threshold</th><th>Click #</th> </tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            </div>
+        </div>
+		<!-- Center Column -->
+		<!--/container-fluid-->
+        <footer>
+            <div class="copyright">
+                <div class="container">
+                    <p>Copyright &copy; datapipeline.com 2019</p>
+                </div>
+            </div>
+        </footer>
+	
+</body>
+
+</html>
