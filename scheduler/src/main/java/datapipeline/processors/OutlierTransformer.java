@@ -70,7 +70,7 @@ public class OutlierTransformer<K, V> implements Transformer<K, V, KeyValue<Stri
         }
 
         if (num > (double)_warmup) {
-            if (Math.abs(casted_value - prev_mean) > _threshold * Math.sqrt(prev_var)) {
+            if (casted_value - prev_mean > _threshold * Math.sqrt(prev_var)) {
 
                 return KeyValue.pair(key.toString(), Double.toString(Math.abs(casted_value - prev_mean)));
             }

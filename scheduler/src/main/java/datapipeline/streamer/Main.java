@@ -15,6 +15,7 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.*;
 import org.apache.kafka.streams.state.WindowStore;
+import sun.tools.tree.DoubleExpression;
 
 import java.time.Duration;
 import java.util.LinkedList;
@@ -27,6 +28,7 @@ public class Main {
     public static void main(String[] argv) {
 
         int _ID = 0;
+
         final Properties streamsConfiguration = new Properties();
         final Serde<String> stringSerde = Serdes.String();
 
@@ -35,11 +37,8 @@ public class Main {
         streamsConfiguration.put(StreamsConfig.APPLICATION_ID_CONFIG, KafkaConstants.STREAMER_PREFIX + _ID);
         streamsConfiguration.put(StreamsConfig.CLIENT_ID_CONFIG, KafkaConstants.STREAMER_PREFIX + _ID);
 
-
-        KafkaManager instance = KafkaManager.getInstance();
+        KafkaManager km = KafkaManager.getInstance();
         KafkaManager.deleteTopicWithPrefix(KafkaConstants.STREAMER_PREFIX + _ID);
-        KafkaManager.deleteTopicWithPrefix("anomaly");
-        //KafkaManager.deleteTopicWithPrefix("throughput");
 
         // Where to find Kafka broker(s).
         streamsConfiguration.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaConstants.KAFKA_BROKERS);
@@ -49,7 +48,7 @@ public class Main {
         streamsConfiguration.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName()); // Set the commit interval to 500ms so that any changes are flushed frequently. The low latency
 
         // ***very important***
-        streamsConfiguration.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, 100);
+        //streamsConfiguration.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, 100);
         streamsConfiguration.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, 0);
 
 
@@ -59,52 +58,50 @@ public class Main {
         final KStream<String, String> views = builder.stream("throughput");
         ControlledFilterWrapper<String, String> wrapper = new ControlledFilterWrapper<>();
 
-        KStream<String, Integer> mappedStream = views
+        KStream<Integer, Long> mappedStream = views
                 .flatMap((k, v) -> {
-                    List<KeyValue<String, Integer>> result = new LinkedList<>();
+                    List<KeyValue<Integer, Long>> result = new LinkedList<>();
 
                     Gson gson = new Gson();
-                    int[] value = gson.fromJson(v, int[].class);
+                    long[] value = gson.fromJson(v, long[].class);
 
                     for (int i = 0; i < value.length; i++) {
-                        result.add(new KeyValue<>(Integer.toString(i), value[i]));
+                        result.add(new KeyValue<>(i, value[i]));
                         // KafkaManager.createTopic(job_id, this._ID,(short)1);
                     }
                     return result;
                 });
 
-        KGroupedStream<String, Integer> groupedStream = mappedStream.groupByKey(Grouped.with(stringSerde, Serdes.Integer()));
-        TimeWindowedKStream <String, Integer> windowedStream = groupedStream.windowedBy(TimeWindows.of(Duration.ofMillis(1000)).grace(Duration.ofMillis((long)(1000 * 0.1))));
-        KTable<Windowed<String>, Tuple2<Double, Double>> aggregatedStream = windowedStream
+        KGroupedStream<Integer, Long> groupedStream = mappedStream.groupByKey(Grouped.with(Serdes.Integer(), Serdes.Long()));
+        TimeWindowedKStream <Integer, Long> windowedStream = groupedStream.windowedBy(TimeWindows.of(Duration.ofMillis(2000)).grace(Duration.ofMillis((long)(2000 * 0.1))));
+        KTable<Windowed<Integer>, Tuple2<Double, Double>> aggregatedStream = windowedStream
                 .aggregate(
                         () -> new Tuple2<>(0.0, 0.0),
                         (aggKey, newValue, aggregate)  -> {
                             aggregate.value1 ++;
                             try{
-                                aggregate.value2 += newValue;
+                                aggregate.value2 += (double) newValue;
                             } catch(Exception e) {
 
                             }
                             return aggregate;
                         },
-                        Materialized.<String, Tuple2<Double, Double>, WindowStore<Bytes, byte[]>>as("timed-window").withValueSerde(new Tuple2Serde<>())
+                        Materialized.<Integer, Tuple2<Double, Double>, WindowStore<Bytes, byte[]>>as("timed-window").withValueSerde(new Tuple2Serde<>())
                 )
                 .suppress(Suppressed.untilWindowCloses(Suppressed.BufferConfig.unbounded()));
 
-        KStream<String, String> anomalousData = aggregatedStream.mapValues(value -> Double.toString(value.value2 / value.value1))
-                .filter((key, value) -> Double.parseDouble(value) > (double)5)
-                .toStream()
-                // .filter((key, value) ->  value != null)
-                .map(((key, value) -> KeyValue.pair(key.toString(), value)));
+        KStream<String, String> anomalousData = aggregatedStream.toStream()
+                .map((k, v) -> KeyValue.pair(k.toString(), Double.toString(v.value2 / v.value1)))
+                .filter((key, value) -> Double.parseDouble(value) > 5f);
 
 
 
-       // wrapper.getControlledStream(anomalousData
-       //         , builder
-       //         , KafkaConstants.CONTROL_FLOW_TOPIC_PREFIX + _ID
-       //         , new ControlledFilterTransformer<>(_ID, 5)
-       //         , _ID)
-                anomalousData.to("anomaly_0");
+        /*wrapper.getControlledStream(anomalousData
+                , builder
+                , KafkaConstants.CONTROL_FLOW_TOPIC_PREFIX + _ID
+                , new ControlledFilterTransformer<>(_ID, 5)
+                ,_ID)*/
+        anomalousData.to(KafkaConstants.STREAMER_OUTPUT_TOPIC_PREFIX + _ID);
 
         final KafkaStreams streams = new KafkaStreams(builder.build(), streamsConfiguration);
 
@@ -124,6 +121,7 @@ public class Main {
 
         // Add shutdown hook to respond to SIGTERM and gracefully close Kafka Streams
         Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
+
 
 
 

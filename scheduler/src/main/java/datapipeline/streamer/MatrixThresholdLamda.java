@@ -77,7 +77,6 @@ public class MatrixThresholdLamda implements Runnable {
 
                     for (int i = 0; i < value.length; i++) {
                         result.add(new KeyValue<>(Integer.toString(i), Integer.toString(value[i])));
-                            // KafkaManager.createTopic(job_id, this._ID,(short)1);
                     }
                     return result;
                 });
@@ -105,8 +104,6 @@ public class MatrixThresholdLamda implements Runnable {
                 .toStream()
                 // .filter((key, value) ->  value != null)
                 .map(((key, value) -> KeyValue.pair(key.toString(), value)));
-
-
 
         wrapper.getControlledStream(anomalousData
                 , builder

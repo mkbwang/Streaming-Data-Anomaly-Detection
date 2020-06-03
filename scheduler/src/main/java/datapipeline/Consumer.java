@@ -21,6 +21,8 @@ public class Consumer {
         //Producer<Long, String> prod = ProducerFactory.createProducer();
 
 
+        KafkaManager km = KafkaManager.getInstance();
+        KafkaManager.deleteTopicWithPrefix("anomaly_0");
         Properties props = new Properties();
         props.put("bootstrap.servers", "localhost:9092");
         props.put("group.id", "test");
@@ -30,31 +32,45 @@ public class Consumer {
         props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         //props.setProperty("auto.offset.reset", "latest");
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
+
+
         consumer.subscribe(Arrays.asList("anomaly_0"));
 
         Long lastTimestamp = (long)0;
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-
+        long start_time = timestamp.getTime();
         int index = 0;
-        long overall = 0;
+        double overall = 0f;
         while (true) {
             //prod.send(new ProducerRecord<Long, String>(KafkaConstants.TEST_TOPIC, (long) 0, "Test2"));
             ConsumerRecords<String, String> records = consumer.poll(Long.MAX_VALUE);
             Long tmp = (long)0;
             for (ConsumerRecord<String, String> record : records) {
                 tmp = new Timestamp(System.currentTimeMillis()).getTime();
-                //timestamp = new Timestamp(System.currentTimeMillis());
-                long interval = tmp - lastTimestamp;
-                //long interval = tmp - 1564976963439L - (long) Double.parseDouble(record.value()) - 1000;
-                System.out.printf("offset = %d, key = %s, value = %s, interval=%d\n", record.offset(), record.key(), record.value(), interval);
+                // timestamp = new Timestamp(System.currentTimeMillis());
+                // long interval = tmp - lastTimestamp;
+                long interval = tmp - (long) Double.parseDouble(record.value());
+                //System.out.printf("offset = %d, key = %s, value = %s, interval=%d\n", record.offset(), record.key(), record.value(), interval);
                 overall += interval;
                 index += 1;
-                lastTimestamp = tmp;
-            }
+                //lastTimestamp = tmp;
+                //System.out.println(index);
 
-            System.out.printf("average_time = %f\n", (double)overall / (double)index);
-            index = 0;
-            overall = 0;
+                /*if (index % 3000000 == 0) {
+                    long curr_time = new Timestamp(System.currentTimeMillis()).getTime();
+                    //System.out.println(index);
+                    double throughput = (double) index * 48f / (1024f * 1024f * ((curr_time - start_time) / 1000f));
+                    System.out.printf("Bandwidth: > 40 Gib/s, Message size: %d Bytes, Number of Message: %d, Throughput: %f MB/s\n, Delay: %f", 48, index, throughput);
+                }*/
+            }
+            System.out.printf("Average delay: %f\n", overall / (double)index);
+
+
+            //System.out.printf("average_time = %f\n", (double)overall / (double)index);
+            //index = 0;
+            //overall = 0;
+            //long curr_time = new Timestamp(System.currentTimeMillis()).getTime();
+            //System.out.printf("Throughput:" , (double)index * 100f / (1024f * 1024f * ((curr_time - start_time) / 1000)));
 
         }
         /*Properties props = new Properties();
