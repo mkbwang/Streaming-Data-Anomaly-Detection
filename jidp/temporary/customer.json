@@ -1,0 +1,1 @@
+[{"TimeStamp": "20:10", "UserID": "0000001", "AnomalyReason": "Clicked more than 40 brands."}, {"TimeStamp": "19:18", "UserID": "0000002", "AnomalyReason": "Clicked more than 30 products."}, {"TimeStamp": "18:17", "UserID": "0000003", "AnomalyReason": "Clicked more than 10 categories."}]

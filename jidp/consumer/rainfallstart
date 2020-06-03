@@ -1,0 +1,8 @@
+#!/bin/bash
+
+nohup python rainfallanomaly1_consumer.py &
+echo "nohup python rainfallanomaly1_consumer.py &"
+nohup python heatmap_consumer.py &
+echo "nohup python heatmap_consumer.py &"
+nohup python rainfallanomaly2_consumer.py &
+echo "nohup python rainfallanomaly2_consumer.py &" 

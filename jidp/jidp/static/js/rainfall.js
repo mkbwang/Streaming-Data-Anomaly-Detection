@@ -8,7 +8,7 @@ $(document).ready( function() {
         $('#currrainfall').attr("src", "data:image/png;base64,"+rawImage);
       });
   }
-  setInterval(askforimg1,10000);
+  setInterval(askforimg1,2000);
   // function askforimg2(){
   //   $.ajax({
   //     type:"GET",

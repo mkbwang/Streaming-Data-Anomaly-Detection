@@ -1,0 +1,9 @@
+#!/bin/bash
+
+nohup python userbrand_consumer.py &
+echo "nohup python userbrand_consumer.py &"
+nohup python userproduct_consumer.py &
+echo "nohup python userproduct_consumer.py &"
+nohup python usercategory_consumer.py &
+echo "nohup python usercategory_consumer.py &"
+
